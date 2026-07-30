@@ -1,10 +1,8 @@
 # Aegis
 
-[![CI](https://github.com/OWNER/aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/aegis/actions/workflows/ci.yml)
+[![CI](https://github.com/dubare0898/Aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/dubare0898/Aegis/actions/workflows/ci.yml)
 
 **Aegis** is a simulation-first counter-UAS (C-UAS) **decision-support** platform: layered sensors feed deterministic fusion and doctrine-aware recommendations that **prioritize threats by impact and trajectory (time-to-arrival)** so scarce jammer/kinetic capacity is conserved for the right tracks—then an operator authorizes soft or mission-critical effects in the loop.
-
-> Replace `OWNER/aegis` in the badge URL after you create the GitHub repository (see [MAINTAINER_NOTES.md](MAINTAINER_NOTES.md)).
 
 ## What this is / what this is not
 
