@@ -588,10 +588,7 @@ fn eta_comfortable(tr: &Track) -> bool {
     }
 }
 
-fn conserve_soft_alternative(
-    tr: &Track,
-    keep_out: Option<&Zone>,
-) -> (RecommendedAction, String) {
+fn conserve_soft_alternative(tr: &Track, keep_out: Option<&Zone>) -> (RecommendedAction, String) {
     let zone_breach = keep_out
         .map(|z| tr.position.distance_xy(&z.center) < z.radius_m)
         .unwrap_or(false);
@@ -687,12 +684,7 @@ fn decide_action(
                 uncertainty,
             );
         }
-        if !soft_first
-            && dist < 1600.0
-            && tr.threat_score > 55.0
-            && has_radar
-            && has_eo
-        {
+        if !soft_first && dist < 1600.0 && tr.threat_score > 55.0 && has_radar && has_eo {
             rationale.push("Corroborated RF-dark threat — kinetic engage authorized path".into());
             return (
                 RecommendedAction::EngageKinetic,
@@ -1000,10 +992,19 @@ mod tests {
         assert!(near_tr.eta_s.is_some() && far_tr.eta_s.is_some());
         assert!(near_tr.eta_s.unwrap() < far_tr.eta_s.unwrap());
         assert!(near_tr.threat_score > far_tr.threat_score);
-        let near_pri = recs.iter().find(|r| r.track_id == near_id).map(|r| r.priority);
-        let far_pri = recs.iter().find(|r| r.track_id == far_id).map(|r| r.priority);
+        let near_pri = recs
+            .iter()
+            .find(|r| r.track_id == near_id)
+            .map(|r| r.priority);
+        let far_pri = recs
+            .iter()
+            .find(|r| r.track_id == far_id)
+            .map(|r| r.priority);
         if let (Some(np), Some(fp)) = (near_pri, far_pri) {
-            assert!(np < fp, "tighter ETA should get better (lower) priority number");
+            assert!(
+                np < fp,
+                "tighter ETA should get better (lower) priority number"
+            );
         }
         assert!(recs.iter().any(|r| {
             r.evidence.iter().any(|e| e.kind == "eta")
@@ -1076,9 +1077,7 @@ mod tests {
         let recs = eng.evaluate(10.0, &mut tracks, &zones());
         let open_critical = recs
             .iter()
-            .filter(|r| {
-                r.status == RecommendationStatus::Open && is_mission_critical(r.action)
-            })
+            .filter(|r| r.status == RecommendationStatus::Open && is_mission_critical(r.action))
             .count();
         assert!(
             open_critical <= MAX_OPEN_MISSION_CRITICAL,
