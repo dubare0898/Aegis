@@ -1,0 +1,18 @@
+[package]
+name = "cuas_sim"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+cuas_schema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+[dev-dependencies]
+cuas_fusion = { workspace = true }

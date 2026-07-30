@@ -1,0 +1,9 @@
+[package]
+name = "cuas_fusion"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+cuas_schema = { workspace = true }
+uuid = { workspace = true }

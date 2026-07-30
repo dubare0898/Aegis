@@ -1,0 +1,11 @@
+{
+  "name": "cuas-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Aegis desktop shell (Tauri)",
+  "scripts": {
+    "dev": "cargo tauri dev --config src-tauri/tauri.conf.json",
+    "build": "bash ../../scripts/build-desktop.sh",
+    "tauri": "cargo tauri"
+  }
+}

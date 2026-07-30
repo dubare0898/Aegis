@@ -1,0 +1,1379 @@
+{
+  "seed": 42,
+  "tick": 120,
+  "t": 5.999999999999987,
+  "truth": [
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000000",
+      "label": "H-01",
+      "role": "decoy",
+      "position": {
+        "x": -2296.2262203113905,
+        "y": -1653.5889087525632,
+        "z": 205.09480961533492
+      },
+      "velocity": {
+        "x": 23.70461672350328,
+        "y": 16.51099416052004,
+        "z": 6.0
+      },
+      "affiliation": "hostile",
+      "class": "multirotor",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000001",
+      "label": "H-02",
+      "role": "decoy",
+      "position": {
+        "x": -2379.812748019881,
+        "y": -1608.4299553623887,
+        "z": 186.40202797989684
+      },
+      "velocity": {
+        "x": 19.16414852492179,
+        "y": 7.054426954122998,
+        "z": 6.0
+      },
+      "affiliation": "hostile",
+      "class": "multirotor",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000002",
+      "label": "H-03",
+      "role": "decoy",
+      "position": {
+        "x": -2365.9630493000154,
+        "y": -1717.071858733785,
+        "z": 218.8495134458084
+      },
+      "velocity": {
+        "x": 26.46004697382343,
+        "y": 11.183060765621672,
+        "z": 6.0
+      },
+      "affiliation": "hostile",
+      "class": "multirotor",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000003",
+      "label": "H-04",
+      "role": "fiber_optic",
+      "position": {
+        "x": -2449.728484884558,
+        "y": -1675.9976025800586,
+        "z": 121.20261674604775
+      },
+      "velocity": {
+        "x": 17.80197157709575,
+        "y": 11.109957550311695,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "fiber_optic_uas",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000004",
+      "label": "H-05",
+      "role": "fiber_optic",
+      "position": {
+        "x": -2338.881925702547,
+        "y": -1806.7179228294442,
+        "z": 112.09107752043059
+      },
+      "velocity": {
+        "x": 30.900441015512943,
+        "y": 7.922756448256573,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "fiber_optic_uas",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000005",
+      "label": "H-06",
+      "role": "fiber_optic",
+      "position": {
+        "x": -2515.5255605593893,
+        "y": -1609.3668476599153,
+        "z": 109.13179007319512
+      },
+      "velocity": {
+        "x": 22.16786441911615,
+        "y": 23.220572951339737,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "fiber_optic_uas",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000006",
+      "label": "H-07",
+      "role": "fiber_optic",
+      "position": {
+        "x": -2444.307940214583,
+        "y": -1789.4556440390595,
+        "z": 131.80613999847935
+      },
+      "velocity": {
+        "x": 19.620031529495698,
+        "y": 25.331885657081862,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "fiber_optic_uas",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000007",
+      "label": "H-08",
+      "role": "strike",
+      "position": {
+        "x": -2535.148331041817,
+        "y": -1714.5137333072014,
+        "z": 121.65009718093447
+      },
+      "velocity": {
+        "x": 34.27848238640323,
+        "y": 8.771689246409181,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "swarm_member",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000008",
+      "label": "H-09",
+      "role": "strike",
+      "position": {
+        "x": -2460.3863661467585,
+        "y": -1853.8515603782987,
+        "z": 121.10394564033423
+      },
+      "velocity": {
+        "x": 32.060002378371166,
+        "y": 15.48846470302897,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "swarm_member",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-000000000009",
+      "label": "H-10",
+      "role": "strike",
+      "position": {
+        "x": -2615.488795657029,
+        "y": -1713.5251092745605,
+        "z": 100.16289145743995
+      },
+      "velocity": {
+        "x": 29.2483565496219,
+        "y": 20.454028787356187,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "swarm_member",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-00000000000a",
+      "label": "H-11",
+      "role": "strike",
+      "position": {
+        "x": -2465.626594226886,
+        "y": -1948.5427999397718,
+        "z": 114.06443645080829
+      },
+      "velocity": {
+        "x": 32.021859895490685,
+        "y": 15.507578055153889,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "swarm_member",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-00000000000b",
+      "label": "H-12",
+      "role": "strike",
+      "position": {
+        "x": -2701.006091001598,
+        "y": -1672.3351092229695,
+        "z": 120.38319957653445
+      },
+      "velocity": {
+        "x": 28.694540635292313,
+        "y": 21.18067944202519,
+        "z": -6.0
+      },
+      "affiliation": "hostile",
+      "class": "swarm_member",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-00000000000d",
+      "label": "FIBER-GCS-1",
+      "role": "fiber_gcs",
+      "position": {
+        "x": -2134.672826240387,
+        "y": -1763.2844140724656,
+        "z": 2.0
+      },
+      "velocity": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "affiliation": "neutral",
+      "class": "unknown",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-00000000000e",
+      "label": "FIBER-SPOOL-2",
+      "role": "fiber_gcs",
+      "position": {
+        "x": -2336.5717318359552,
+        "y": -1474.9428944827405,
+        "z": 2.0
+      },
+      "velocity": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "affiliation": "neutral",
+      "class": "unknown",
+      "rf_dark": true,
+      "jammed": false,
+      "neutralized": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-00000000000c",
+      "label": "MED-EVAC-1",
+      "role": "friendly",
+      "position": {
+        "x": -1470.0,
+        "y": 2080.0,
+        "z": 420.0
+      },
+      "velocity": {
+        "x": 55.0,
+        "y": -20.0,
+        "z": 0.0
+      },
+      "affiliation": "friendly",
+      "class": "manned",
+      "rf_dark": false,
+      "jammed": false,
+      "neutralized": false
+    }
+  ],
+  "detections": [
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001be",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2276.566825536817,
+        "y": -1686.418153016102,
+        "z": 205.46717283755677
+      },
+      "velocity": {
+        "x": 23.70461672350328,
+        "y": 16.51099416052004,
+        "z": 6.0
+      },
+      "range_m": 2914.493543610154,
+      "bearing_rad": -2.3659556241628437,
+      "elevation_rad": 0.0643668210100997,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001bf",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2380.0146494926,
+        "y": -1621.9119328758277,
+        "z": 186.60930232146757
+      },
+      "velocity": {
+        "x": 19.16414852492179,
+        "y": 7.054426954122998,
+        "z": 6.0
+      },
+      "range_m": 2944.3725375450977,
+      "bearing_rad": -2.4062745454864065,
+      "elevation_rad": 0.05729627928297515,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c0",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2377.7087393093575,
+        "y": -1742.2618837444354,
+        "z": 232.2560304428568
+      },
+      "velocity": {
+        "x": 26.46004697382343,
+        "y": 11.183060765621672,
+        "z": 6.0
+      },
+      "range_m": 3027.520568058175,
+      "bearing_rad": -2.3762029305940504,
+      "elevation_rad": 0.07082867766592608,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c1",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2309.6864748861717,
+        "y": -1821.3950503466328,
+        "z": 106.50592523824768
+      },
+      "velocity": {
+        "x": 30.900441015512943,
+        "y": 7.922756448256573,
+        "z": -6.0
+      },
+      "range_m": 3028.789656907488,
+      "bearing_rad": -2.341781239267931,
+      "elevation_rad": 0.029225709263509134,
+      "snr_db": 24.0,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.28,
+      "affiliation": "unknown",
+      "rf_dark": true
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c2",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2528.3526876429114,
+        "y": -1704.3294863115677,
+        "z": 134.4019611986613
+      },
+      "velocity": {
+        "x": 34.27848238640323,
+        "y": 8.771689246409181,
+        "z": -6.0
+      },
+      "range_m": 3107.256875920305,
+      "bearing_rad": -2.418637293381686,
+      "elevation_rad": 0.03747009292173767,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c3",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2447.3114130353633,
+        "y": -1853.3091117754373,
+        "z": 121.7662195235682
+      },
+      "velocity": {
+        "x": 32.060002378371166,
+        "y": 15.48846470302897,
+        "z": -6.0
+      },
+      "range_m": 3148.9279219292844,
+      "bearing_rad": -2.3660809470089994,
+      "elevation_rad": 0.0329588390378257,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c4",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2593.3631734444148,
+        "y": -1691.8518897828797,
+        "z": 103.9737873440944
+      },
+      "velocity": {
+        "x": 29.2483565496219,
+        "y": 20.454028787356187,
+        "z": -6.0
+      },
+      "range_m": 3147.1793580792505,
+      "bearing_rad": -2.4352837920713837,
+      "elevation_rad": 0.027321126081835248,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c5",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2451.693331938445,
+        "y": -1966.2223934181836,
+        "z": 98.71178473504396
+      },
+      "velocity": {
+        "x": 32.021859895490685,
+        "y": 15.507578055153889,
+        "z": -6.0
+      },
+      "range_m": 3231.3346204104323,
+      "bearing_rad": -2.3420688422185787,
+      "elevation_rad": 0.02498044590214239,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c6",
+      "sensor_id": "radar-north",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2701.2950672954275,
+        "y": -1659.0052833498187,
+        "z": 122.56068298439
+      },
+      "velocity": {
+        "x": 28.694540635292313,
+        "y": 21.18067944202519,
+        "z": -6.0
+      },
+      "range_m": 3209.90843773309,
+      "bearing_rad": -2.4649120202652393,
+      "elevation_rad": 0.032580114106462416,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c7",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2293.5283837850557,
+        "y": -1630.2205583354946,
+        "z": 211.57899727955487
+      },
+      "velocity": {
+        "x": 23.70461672350328,
+        "y": 16.51099416052004,
+        "z": 6.0
+      },
+      "range_m": 3131.116876975516,
+      "bearing_rad": -2.6225485265445587,
+      "elevation_rad": 0.06186371669743951,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c8",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2413.0218952475375,
+        "y": -1787.9224851861616,
+        "z": 123.52385297880659
+      },
+      "velocity": {
+        "x": 19.620031529495698,
+        "y": 25.331885657081862,
+        "z": -6.0
+      },
+      "range_m": 3309.7050560289986,
+      "bearing_rad": -2.5990710775679897,
+      "elevation_rad": 0.0318885633326697,
+      "snr_db": 24.0,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.28,
+      "affiliation": "unknown",
+      "rf_dark": true
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001c9",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2565.23658283816,
+        "y": -1692.5221172980187,
+        "z": 133.5925916761476
+      },
+      "velocity": {
+        "x": 34.27848238640323,
+        "y": 8.771689246409181,
+        "z": -6.0
+      },
+      "range_m": 3394.8824252897107,
+      "bearing_rad": -2.6463311840135946,
+      "elevation_rad": 0.03405565319317057,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001ca",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2454.505529190562,
+        "y": -1875.2452783367244,
+        "z": 126.96811689867583
+      },
+      "velocity": {
+        "x": 32.060002378371166,
+        "y": 15.48846470302897,
+        "z": -6.0
+      },
+      "range_m": 3390.8054643753685,
+      "bearing_rad": -2.583323793940113,
+      "elevation_rad": 0.0321418857005517,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001cb",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2592.099258606047,
+        "y": -1701.1495953597291,
+        "z": 96.02812266486022
+      },
+      "velocity": {
+        "x": 29.2483565496219,
+        "y": 20.454028787356187,
+        "z": -6.0
+      },
+      "range_m": 3421.542976809836,
+      "bearing_rad": -2.647844334967897,
+      "elevation_rad": 0.02280692894124354,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001cc",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2494.1169299791068,
+        "y": -1920.6049713921202,
+        "z": 105.78631615578324
+      },
+      "velocity": {
+        "x": 32.021859895490685,
+        "y": 15.507578055153889,
+        "z": -6.0
+      },
+      "range_m": 3447.8414377126514,
+      "bearing_rad": -2.5782493921145484,
+      "elevation_rad": 0.025463991152540656,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001cd",
+      "sensor_id": "radar-east",
+      "sensor_kind": "radar",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2687.8640118453654,
+        "y": -1660.1733243847955,
+        "z": 117.35381657814055
+      },
+      "velocity": {
+        "x": 28.694540635292313,
+        "y": 21.18067944202519,
+        "z": -6.0
+      },
+      "range_m": 3487.9274121015633,
+      "bearing_rad": -2.6712130655978585,
+      "elevation_rad": 0.028488912087323962,
+      "snr_db": 24.0,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "rf_dark": false
+    },
+    {
+      "id": "9e3779b9-7f4a-7c3f-0000-0000000001ce",
+      "sensor_id": "adsb-gate",
+      "sensor_kind": "adsb",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -1470.0,
+        "y": 2080.0,
+        "z": 420.0
+      },
+      "velocity": {
+        "x": 55.0,
+        "y": -20.0,
+        "z": 0.0
+      },
+      "range_m": 2579.8061942711897,
+      "bearing_rad": 2.186025316392459,
+      "elevation_rad": 0.15960340735418332,
+      "snr_db": 30.0,
+      "class_hypothesis": "manned",
+      "class_confidence": 0.95,
+      "affiliation": "friendly",
+      "rf_dark": false
+    }
+  ],
+  "tracks": [
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000000",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2538.492512143422,
+        "y": -1746.3148188780392,
+        "z": 119.94576894447609
+      },
+      "velocity": {
+        "x": 90.78921685912725,
+        "y": -64.31452707018771,
+        "z": -5.829202331419246
+      },
+      "covariance_trace": 4.199999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 55,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000001",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2600.2831928191295,
+        "y": -1690.8786817061523,
+        "z": 112.57917905322618
+      },
+      "velocity": {
+        "x": 30.37815327059607,
+        "y": 18.37900000580003,
+        "z": -5.9646351012943715
+      },
+      "covariance_trace": 4.199999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 53,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000002",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2447.566422519963,
+        "y": -1876.5827773789108,
+        "z": 123.23734953325287
+      },
+      "velocity": {
+        "x": 26.695858502043077,
+        "y": 8.675523153924724,
+        "z": -5.9999664868779705
+      },
+      "covariance_trace": 4.3199999999999985,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 50,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000003",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2372.943417358551,
+        "y": -1623.232196095934,
+        "z": 157.55303282949964
+      },
+      "velocity": {
+        "x": 169.79558824585843,
+        "y": 91.70731725897762,
+        "z": -2.3997611434454162
+      },
+      "covariance_trace": 4.199999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 47,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000004",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2334.506629421938,
+        "y": -1813.7486057924875,
+        "z": 114.61472503746168
+      },
+      "velocity": {
+        "x": 29.148287012244012,
+        "y": 10.661048957143171,
+        "z": -5.668644476253479
+      },
+      "covariance_trace": 4.3199999999999985,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 43,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000005",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2251.849385850945,
+        "y": -1694.207795993287,
+        "z": 205.40389703196186
+      },
+      "velocity": {
+        "x": 140.3931950735761,
+        "y": -83.004406050833,
+        "z": 5.778268973174512
+      },
+      "covariance_trace": 4.199999999999998,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 41,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000006",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -3882.5809940990434,
+        "y": -1554.7503355800625,
+        "z": 107.59642163742913
+      },
+      "velocity": {
+        "x": -606.8931462640405,
+        "y": 42.97217638201667,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 27.40000000000002,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar",
+        "rf"
+      ],
+      "hit_count": 21,
+      "coast_ticks": 39,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "coasting",
+      "last_update_t": 4.0499999999999865,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000007",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2381.958129984824,
+        "y": -1710.5335346285808,
+        "z": 219.3802317640784
+      },
+      "velocity": {
+        "x": 24.106550201084747,
+        "y": 11.468046297145996,
+        "z": 5.011748399999998
+      },
+      "covariance_trace": 4.535999999999998,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar"
+      ],
+      "hit_count": 22,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000008",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2724.9389847623097,
+        "y": -1702.309936111609,
+        "z": 120.38732516318262
+      },
+      "velocity": {
+        "x": -29.309647130183926,
+        "y": -22.135455326121466,
+        "z": -4.235999999999999
+      },
+      "covariance_trace": 5.9299199999999965,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 23,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000009",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2336.8184564051912,
+        "y": -1661.1465121912847,
+        "z": 207.2692005074638
+      },
+      "velocity": {
+        "x": 23.97869567960136,
+        "y": 14.429479545431441,
+        "z": 5.565585349923599
+      },
+      "covariance_trace": 5.299199999999997,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 19,
+      "coast_ticks": 0,
+      "age_s": 5.699999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000a",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2500.25682457298,
+        "y": -1667.6946022156615,
+        "z": 134.18626298845595
+      },
+      "velocity": {
+        "x": 26.67055940504914,
+        "y": 14.045912867488507,
+        "z": -3.22486380649452
+      },
+      "covariance_trace": 6.258239999999998,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar"
+      ],
+      "hit_count": 20,
+      "coast_ticks": 0,
+      "age_s": 5.249999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000b",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2460.0811930733425,
+        "y": -1843.817941174117,
+        "z": 119.37382155501528
+      },
+      "velocity": {
+        "x": 28.681473573074356,
+        "y": 18.686741443054075,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 5.399999999999998,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 16,
+      "coast_ticks": 0,
+      "age_s": 4.999999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000c",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -1470.0,
+        "y": 2080.0,
+        "z": 420.0
+      },
+      "velocity": {
+        "x": 55.0,
+        "y": -20.0,
+        "z": 0.0
+      },
+      "covariance_trace": 19.710720000000038,
+      "class_hypothesis": "manned",
+      "class_confidence": 0.95,
+      "affiliation": "friendly",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "adsb"
+      ],
+      "hit_count": 6,
+      "coast_ticks": 0,
+      "age_s": 4.999999999999987,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "adsb",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000d",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2326.7043275733686,
+        "y": -1592.719707961572,
+        "z": 202.0882182135282
+      },
+      "velocity": {
+        "x": 21.911007721324058,
+        "y": 18.213691819239017,
+        "z": 5.999999999999999
+      },
+      "covariance_trace": 27.164275200000056,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar"
+      ],
+      "hit_count": 7,
+      "coast_ticks": 15,
+      "age_s": 4.849999999999986,
+      "rf_dark": true,
+      "track_status": "coasting",
+      "last_update_t": 5.249999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000e",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2534.5209908443258,
+        "y": -1665.248743199911,
+        "z": 109.14014797163769
+      },
+      "velocity": {
+        "x": 23.931895000563692,
+        "y": 21.40046604948341,
+        "z": -5.3949479999999985
+      },
+      "covariance_trace": 11.22796800000002,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 7,
+      "coast_ticks": 0,
+      "age_s": 4.249999999999986,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000013",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2708.761995985971,
+        "y": -1655.672416535527,
+        "z": 126.37611210418737
+      },
+      "velocity": {
+        "x": 14.56396606735018,
+        "y": 10.892101810899721,
+        "z": -3.0599999999999996
+      },
+      "covariance_trace": 22.824000000000016,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar",
+        "rf"
+      ],
+      "hit_count": 3,
+      "coast_ticks": 0,
+      "age_s": 1.4499999999999948,
+      "rf_dark": false,
+      "track_status": "tentative",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000014",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2234.9028099777415,
+        "y": -1904.1397514906794,
+        "z": 112.14023918309526
+      },
+      "velocity": {
+        "x": 30.932093209428974,
+        "y": 7.780943557512557,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 30.600000000000016,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.48,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar"
+      ],
+      "hit_count": 2,
+      "coast_ticks": 5,
+      "age_s": 0.7499999999999973,
+      "rf_dark": true,
+      "track_status": "coasting",
+      "last_update_t": 5.749999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000015",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2461.28851192768,
+        "y": -1960.426232029785,
+        "z": 106.93051191895856
+      },
+      "velocity": {
+        "x": 32.25277641952262,
+        "y": 14.967127018883989,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 25.800000000000004,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 2,
+      "coast_ticks": 0,
+      "age_s": 0.2499999999999991,
+      "rf_dark": false,
+      "track_status": "tentative",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000016",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2475.5250112324184,
+        "y": -1921.715581814946,
+        "z": 112.22536025968428
+      },
+      "velocity": {
+        "x": 31.85650458226094,
+        "y": 15.913264357873452,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 25.800000000000004,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 2,
+      "coast_ticks": 0,
+      "age_s": 0.2499999999999991,
+      "rf_dark": false,
+      "track_status": "tentative",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000017",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2448.110823180589,
+        "y": -1875.6090856988833,
+        "z": 117.27868624231488
+      },
+      "velocity": {
+        "x": 28.53222790972412,
+        "y": 17.91441929946238,
+        "z": -5.999999999999999
+      },
+      "covariance_trace": 25.800000000000004,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 2,
+      "coast_ticks": 0,
+      "age_s": 0.2499999999999991,
+      "rf_dark": false,
+      "track_status": "tentative",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    }
+  ]
+}

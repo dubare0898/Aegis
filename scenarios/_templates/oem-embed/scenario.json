@@ -1,0 +1,46 @@
+{
+  "id": "oem-embed",
+  "name": "OEM Integrator Embed (stub)",
+  "vertical": "oem",
+  "description": "Stub pack — minimal scene for SDK/embed integration tests.",
+  "tick_hz": 20,
+  "default_seed": 3,
+  "site": {
+    "name": "Integrators Lab",
+    "origin_lat": 37.77,
+    "origin_lon": -122.42,
+    "extent_m": 2000
+  },
+  "roe_profile": "oem_sandbox",
+  "zones": [
+    {
+      "id": "asset",
+      "name": "Protected node",
+      "kind": "critical_asset",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 60
+    }
+  ],
+  "sensors": [
+    {
+      "id": "radar-lab",
+      "kind": "radar",
+      "position": { "x": 0, "y": 0, "z": 10 },
+      "range_m": 1500,
+      "pd": 0.9,
+      "pfa": 0.05,
+      "position_sigma_m": 30,
+      "update_hz": 5
+    }
+  ],
+  "swarm": {
+    "count": 3,
+    "ingress_bearing_deg": 180,
+    "start_range_m": 1200,
+    "cruise_speed_mps": 25,
+    "altitude_m": 80,
+    "spread_m": 60,
+    "decoy_fraction": 0.0
+  },
+  "friendlies": []
+}

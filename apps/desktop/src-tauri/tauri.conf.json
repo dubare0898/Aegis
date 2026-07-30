@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Aegis",
+  "version": "0.1.0",
+  "identifier": "com.aegis.cuas",
+  "build": {
+    "beforeDevCommand": "bash ../../../scripts/prepare-desktop-resources.sh --dev",
+    "devUrl": "http://127.0.0.1:8080",
+    "beforeBuildCommand": "bash ../../../scripts/prepare-desktop-resources.sh",
+    "frontendDist": "resources/splash"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Aegis",
+        "width": 1440,
+        "height": 900,
+        "resizable": true,
+        "fullscreen": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/henry.w@example.net",
+      "icons/icon.png"
+    ],
+    "resources": [
+      "resources/cuas_api",
+      "resources/console",
+      "resources/scenarios"
+    ]
+  }
+}

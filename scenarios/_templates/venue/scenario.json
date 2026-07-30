@@ -1,0 +1,53 @@
+{
+  "id": "venue",
+  "name": "Stadium / Venue Security (stub)",
+  "vertical": "commercial_venue",
+  "description": "Stub pack — smaller FOV, privacy-conscious recommendation policy.",
+  "tick_hz": 20,
+  "default_seed": 11,
+  "site": {
+    "name": "Arena One",
+    "origin_lat": 34.04,
+    "origin_lon": -118.26,
+    "extent_m": 2500
+  },
+  "roe_profile": "venue_recommend_only",
+  "zones": [
+    {
+      "id": "bowl",
+      "name": "Venue bowl",
+      "kind": "base_footprint",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 400
+    },
+    {
+      "id": "asset",
+      "name": "Main stage",
+      "kind": "critical_asset",
+      "center": { "x": 0, "y": 80, "z": 0 },
+      "radius_m": 80
+    }
+  ],
+  "sensors": [
+    {
+      "id": "rf-1",
+      "kind": "rf",
+      "position": { "x": 0, "y": 0, "z": 40 },
+      "range_m": 2000,
+      "pd": 0.75,
+      "pfa": 0.03,
+      "position_sigma_m": 70,
+      "update_hz": 2
+    }
+  ],
+  "swarm": {
+    "count": 4,
+    "ingress_bearing_deg": 0,
+    "start_range_m": 1800,
+    "cruise_speed_mps": 22,
+    "altitude_m": 90,
+    "spread_m": 80,
+    "decoy_fraction": 0.25
+  },
+  "friendlies": []
+}

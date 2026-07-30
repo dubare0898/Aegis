@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Aegis
+Comment=Simulation-first C-UAS decision-support console (operator-in-the-loop)
+# Install with: ./scripts/install-desktop-entry.sh
+# (writes a local copy with absolute Exec/Path/Icon for your checkout)
+Exec=aegis-launch-placeholder
+Path=
+Icon=
+Terminal=false
+Categories=Utility;Science;
+StartupNotify=true

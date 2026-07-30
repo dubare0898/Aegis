@@ -1,0 +1,53 @@
+{
+  "id": "critical-infra",
+  "name": "Critical Infrastructure Perimeter (stub)",
+  "vertical": "critical_infrastructure",
+  "description": "Stub pack — same platform core, plant/airport perimeter profile.",
+  "tick_hz": 20,
+  "default_seed": 7,
+  "site": {
+    "name": "Plant Alpha",
+    "origin_lat": 29.76,
+    "origin_lon": -95.36,
+    "extent_m": 4000
+  },
+  "roe_profile": "infrastructure_recommend_only",
+  "zones": [
+    {
+      "id": "footprint",
+      "name": "Facility footprint",
+      "kind": "base_footprint",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 700
+    },
+    {
+      "id": "asset",
+      "name": "Control building",
+      "kind": "critical_asset",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 100
+    }
+  ],
+  "sensors": [
+    {
+      "id": "radar-1",
+      "kind": "radar",
+      "position": { "x": -100, "y": 100, "z": 20 },
+      "range_m": 3500,
+      "pd": 0.86,
+      "pfa": 0.06,
+      "position_sigma_m": 40,
+      "update_hz": 4
+    }
+  ],
+  "swarm": {
+    "count": 6,
+    "ingress_bearing_deg": 90,
+    "start_range_m": 3000,
+    "cruise_speed_mps": 28,
+    "altitude_m": 120,
+    "spread_m": 120,
+    "decoy_fraction": 0.2
+  },
+  "friendlies": []
+}

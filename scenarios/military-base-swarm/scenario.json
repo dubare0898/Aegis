@@ -1,0 +1,165 @@
+{
+  "id": "military-base-swarm",
+  "name": "Forward Operating Base — Swarm Raid",
+  "vertical": "military",
+  "description": "90s demo: layered sensing vs mixed RF + fiber swarm; operator confirms jammer/kinetic.",
+  "tick_hz": 20,
+  "default_seed": 42,
+  "site": {
+    "name": "FOB Sentinel",
+    "origin_lat": 34.85,
+    "origin_lon": 69.12,
+    "extent_m": 6000
+  },
+  "roe_profile": "base_defense_operator_effects",
+  "zones": [
+    {
+      "id": "base",
+      "name": "Base footprint",
+      "kind": "base_footprint",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 900
+    },
+    {
+      "id": "nofly",
+      "name": "No-fly sector",
+      "kind": "no_fly",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 1600
+    },
+    {
+      "id": "keepout",
+      "name": "Keep-out ring",
+      "kind": "keep_out",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "radius_m": 2200
+    },
+    {
+      "id": "toc",
+      "name": "TOC / critical asset",
+      "kind": "critical_asset",
+      "center": { "x": 40, "y": -60, "z": 0 },
+      "radius_m": 120
+    }
+  ],
+  "sensors": [
+    {
+      "id": "radar-north",
+      "kind": "radar",
+      "position": { "x": -200, "y": 350, "z": 18 },
+      "range_m": 5500,
+      "pd": 0.88,
+      "pfa": 0.08,
+      "position_sigma_m": 45,
+      "update_hz": 4
+    },
+    {
+      "id": "radar-east",
+      "kind": "radar",
+      "position": { "x": 420, "y": -80, "z": 18 },
+      "range_m": 4800,
+      "pd": 0.85,
+      "pfa": 0.07,
+      "position_sigma_m": 50,
+      "update_hz": 3.5
+    },
+    {
+      "id": "rf-south",
+      "kind": "rf",
+      "position": { "x": 80, "y": -320, "z": 12 },
+      "range_m": 4000,
+      "pd": 0.7,
+      "pfa": 0.02,
+      "position_sigma_m": 90,
+      "update_hz": 2
+    },
+    {
+      "id": "eo-tower",
+      "kind": "eo_ir",
+      "position": { "x": 20, "y": 40, "z": 35 },
+      "range_m": 3200,
+      "pd": 0.9,
+      "pfa": 0.01,
+      "position_sigma_m": 12,
+      "update_hz": 5
+    },
+    {
+      "id": "adsb-gate",
+      "kind": "adsb",
+      "position": { "x": 0, "y": 0, "z": 10 },
+      "range_m": 8000,
+      "pd": 0.99,
+      "pfa": 0.0,
+      "position_sigma_m": 5,
+      "update_hz": 1
+    },
+    {
+      "id": "acoustic-west",
+      "kind": "acoustic",
+      "position": { "x": -900, "y": 200, "z": 8 },
+      "range_m": 1500,
+      "pd": 0.78,
+      "pfa": 0.04,
+      "position_sigma_m": 70,
+      "update_hz": 3
+    },
+    {
+      "id": "acoustic-ingress",
+      "kind": "acoustic",
+      "position": { "x": -1640, "y": -1150, "z": 8 },
+      "range_m": 1500,
+      "pd": 0.76,
+      "pfa": 0.05,
+      "position_sigma_m": 80,
+      "update_hz": 2.5
+    }
+  ],
+  "swarm": {
+    "count": 12,
+    "ingress_bearing_deg": 215,
+    "start_range_m": 3000,
+    "cruise_speed_mps": 34,
+    "altitude_m": 160,
+    "spread_m": 160,
+    "decoy_fraction": 0.25,
+    "fiber_fraction": 0.35
+  },
+  "friendlies": [
+    {
+      "label": "MED-EVAC-1",
+      "position": { "x": -1800, "y": 2200, "z": 420 },
+      "velocity": { "x": 55, "y": -20, "z": 0 },
+      "class": "manned"
+    }
+  ],
+  "effectors": [
+    {
+      "id": "jammer-north",
+      "kind": "jammer",
+      "position": { "x": -120, "y": 280, "z": 12 },
+      "range_m": 4800,
+      "dwell_s": 14,
+      "cooldown_s": 10,
+      "power": 1.0
+    },
+    {
+      "id": "jammer-east",
+      "kind": "jammer",
+      "position": { "x": 360, "y": -40, "z": 12 },
+      "range_m": 4500,
+      "dwell_s": 12,
+      "cooldown_s": 10,
+      "power": 0.95
+    },
+    {
+      "id": "c-uas-kinetic-1",
+      "kind": "kinetic",
+      "position": { "x": 60, "y": -20, "z": 8 },
+      "range_m": 4200,
+      "dwell_s": 3,
+      "cooldown_s": 15,
+      "pk_base": 0.75,
+      "tof_s": 2.2
+    }
+  ]
+}

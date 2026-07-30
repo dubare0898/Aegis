@@ -1,0 +1,31 @@
+# Optional headless stack. Primary local workflow remains native (cargo / launch-desktop.sh).
+# Tauri desktop is not included.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONSOLE: "1"
+    image: aegis:local
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+    # entrypoint-api.sh → cuas_api --console-dist /app/console when baked
+
+  harness:
+    image: aegis:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONSOLE: "1"
+    profiles: ["harness"]
+    working_dir: /app
+    entrypoint: ["demo_harness"]
+    # Override args, e.g.:
+    #   docker compose run --rm harness --suite smoke
+    #   docker compose run --rm harness --batch --class mixed_rf_dark_raid --seed-start 1 --seed-count 3 --ticks 400
+    command: ["--suite", "smoke"]

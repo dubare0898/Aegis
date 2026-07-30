@@ -1,0 +1,21 @@
+[package]
+name = "demo_harness"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "demo_harness"
+path = "src/main.rs"
+
+[dependencies]
+cuas_schema = { workspace = true }
+cuas_sim = { workspace = true }
+cuas_fusion = { workspace = true }
+cuas_recommend = { workspace = true }
+cuas_scenario = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }

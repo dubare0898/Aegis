@@ -1,0 +1,26 @@
+[package]
+name = "cuas_api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "cuas_api"
+path = "src/main.rs"
+
+[dependencies]
+cuas_schema = { workspace = true }
+cuas_sim = { workspace = true }
+cuas_fusion = { workspace = true }
+cuas_recommend = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+axum = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+futures-util = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+clap = { workspace = true }

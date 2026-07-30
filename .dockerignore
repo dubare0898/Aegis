@@ -1,0 +1,33 @@
+# VCS / IDE
+.git
+.github
+.cursor
+.idea
+.vscode
+
+# Build artifacts
+target
+**/target
+node_modules
+**/node_modules
+dist
+**/dist
+*.log
+*.deb
+*.AppImage
+
+# Desktop / Tauri (not containerized)
+apps/desktop
+
+# Local / docs noise not needed for image
+*.md
+!README.md
+.env
+.env.*
+progress.md
+tasks.md
+
+# Misc
+.DS_Store
+coverage
+**/*.rs.bk
