@@ -6,20 +6,22 @@ All notable changes to Aegis are documented here.
 
 ### Added
 
-- Console engage modes: default **Operator (Y/N)** with batch **Engage high-level threats?** prompt; optional **Auto engage** (sim-only, no Y/N modal)
-- **Random seed** control alongside **Reset 42**
-- Shape-aware structure legend glyphs (ring / tri / diamond / hex / sphere) aligned with the air picture
-- `./scripts/check.sh` — workspace tests + smoke + golden assert
+- `aegis_harness` (renamed from `demo_harness`) with JSONL `RunMetrics` logging under `runs/`, closed-loop Auto-engage KPIs, and `--compare-baseline`
+- Metric baseline gate (`tools/aegis_harness/baselines/metric_baseline.json`); CI runs golden + class sample
+- Interactive scenario class picker over WS/API + console Class control
+- Soft Accept consequences: AlertSector raises sensor attention; EvacuatePad clears friendlies
+- Effector-state-aware recommend (ready/cooldown triage); fusion global greedy association + velocity gate
+- Console track outcome line from effector `last_result` / operator notes
 
 ### Changed
 
-- Calmer swarm flight; fusion velocity EMA; recommend ETA hysteresis; AirScene position lerp for smoother tracks
-- Earlier mission-critical thresholds, jammer divert behavior, and stronger simulated kinetins (golden baseline refreshed)
+- `DemoMetrics` → `RunMetrics`
+- Fusion association under dense swarms; recommend capacity triage uses live effector status
 
 ### Notes
 
 - Auto engage remains a **simulation** convenience for soak/stress—not real autonomous weapons or fire-control
-- Scenario class picker over WS and durable KPI/run logging are planned, not shipped
+- SQLite trending over JSONL is planned, not shipped
 
 ## [0.1.0] — 2026-07-26
 

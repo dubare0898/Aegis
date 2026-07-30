@@ -8,6 +8,7 @@ version = "0.1.0"
 dependencies = [
  "aegis_fusion",
  "aegis_recommend",
+ "aegis_scenario",
  "aegis_schema",
  "aegis_sim",
  "anyhow",
@@ -28,6 +29,22 @@ name = "aegis_fusion"
 version = "0.1.0"
 dependencies = [
  "aegis_schema",
+ "uuid",
+]
+
+[[package]]
+name = "aegis_harness"
+version = "0.1.0"
+dependencies = [
+ "aegis_fusion",
+ "aegis_recommend",
+ "aegis_scenario",
+ "aegis_schema",
+ "aegis_sim",
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
  "uuid",
 ]
 
@@ -357,22 +374,6 @@ name = "data-encoding"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4ae5f15dda3c708c0ade84bfee31ccab44a3da4f88015ed22f63732abe300c8"
-
-[[package]]
-name = "demo_harness"
-version = "0.1.0"
-dependencies = [
- "aegis_fusion",
- "aegis_recommend",
- "aegis_scenario",
- "aegis_schema",
- "aegis_sim",
- "anyhow",
- "clap",
- "serde",
- "serde_json",
- "uuid",
-]
 
 [[package]]
 name = "digest"

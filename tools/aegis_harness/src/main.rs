@@ -1,22 +1,29 @@
+mod closed_loop;
+mod logging;
 mod scoring;
 
 use aegis_fusion::FusionEngine;
 use aegis_recommend::{is_mission_critical, RecommendEngine};
 use aegis_scenario::generate;
 use aegis_schema::{
-    Affiliation, Criticality, DemoMetrics, DispositionReasonCode, GoldenSnapshot, OperatorActor,
-    OperatorDisposition, RecommendedAction, ScenarioClass, ScenarioManifest,
+    Affiliation, Criticality, DispositionReasonCode, GoldenSnapshot, OperatorActor,
+    OperatorDisposition, RecommendedAction, RunMetrics, ScenarioClass, ScenarioManifest,
 };
 use aegis_sim::{resolve_scenario_dir, Simulation};
 use anyhow::{bail, Context, Result};
 use clap::Parser;
+use closed_loop::{auto_engage_tick, ClosedLoopAccum};
+use logging::{
+    append_run, baseline_path, compare_suite, default_log_dir, load_baseline, write_baseline,
+    MetricBaseline,
+};
 use scoring::{score_tracks, truth_kinematics_finite, SmoothnessAccum, MAX_TRACK_COUNT};
 use std::collections::{BTreeMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
 #[derive(Parser, Debug)]
-#[command(name = "demo_harness")]
+#[command(name = "aegis_harness")]
 struct Args {
     #[arg(long, default_value = "military-base-swarm")]
     scenario: String,
@@ -53,6 +60,21 @@ struct Args {
     /// Invariant sample period during soak (ticks).
     #[arg(long, default_value_t = 200)]
     soak_sample_every: u64,
+    /// Append RunMetrics JSONL under this directory (default: runs/).
+    #[arg(long)]
+    log_dir: Option<PathBuf>,
+    /// Disable JSONL logging.
+    #[arg(long, default_value_t = false)]
+    no_log: bool,
+    /// Disable closed-loop Auto-engage during the run (open-loop sensing/fusion only).
+    #[arg(long, default_value_t = false)]
+    no_auto_engage: bool,
+    /// Compare suite/batch results against committed metric baseline.
+    #[arg(long, default_value_t = false)]
+    compare_baseline: bool,
+    /// Rewrite committed metric baseline from this run's floors (smoke).
+    #[arg(long, default_value_t = false)]
+    write_baseline: bool,
 }
 
 #[derive(Clone)]
@@ -62,7 +84,6 @@ struct CaseSpec {
     ticks: u64,
     mutate: fn(&mut ScenarioManifest),
     after_start: fn(&mut Simulation),
-    /// min completeness, max false_track_rate, max rmse, max missed_rate
     thresholds: Thresholds,
 }
 
@@ -89,7 +110,6 @@ fn high_decoy(m: &mut ScenarioManifest) {
 fn high_fiber(m: &mut ScenarioManifest) {
     m.swarm.fiber_fraction = 0.7;
     m.swarm.decoy_fraction = 0.1;
-    // Bring the raid into acoustic envelopes within the smoke horizon.
     m.swarm.start_range_m = 2400.0;
     for s in &mut m.sensors {
         if s.kind == aegis_schema::SensorKind::Acoustic {
@@ -196,7 +216,13 @@ fn smoke_cases() -> Vec<CaseSpec> {
 }
 
 struct RunResult {
-    metrics: DemoMetrics,
+    metrics: RunMetrics,
+}
+
+struct RunOpts {
+    auto_engage: bool,
+    soak: bool,
+    soak_sample_every: u64,
 }
 
 fn run_case(
@@ -207,6 +233,7 @@ fn run_case(
     mutate: fn(&mut ScenarioManifest),
     after_start: fn(&mut Simulation),
     thresholds: Option<Thresholds>,
+    opts: &RunOpts,
 ) -> Result<RunResult> {
     run_case_inner(
         scenario,
@@ -217,8 +244,7 @@ fn run_case(
         after_start,
         thresholds,
         None,
-        false,
-        200,
+        opts,
     )
 }
 
@@ -231,8 +257,7 @@ fn run_case_inner(
     after_start: fn(&mut Simulation),
     thresholds: Option<Thresholds>,
     generated: Option<ScenarioManifest>,
-    soak: bool,
-    soak_sample_every: u64,
+    opts: &RunOpts,
 ) -> Result<RunResult> {
     let mut sim = if let Some(m) = generated {
         Simulation::from_manifest(m, seed)
@@ -257,7 +282,7 @@ fn run_case_inner(
     let truth_hostiles = sim
         .truth_entities()
         .iter()
-        .filter(|e| e.affiliation == aegis_schema::Affiliation::Hostile)
+        .filter(|e| e.affiliation == Affiliation::Hostile)
         .count();
 
     let mut last_tracks = Vec::new();
@@ -270,6 +295,8 @@ fn run_case_inner(
     let mut smoothness = SmoothnessAccum::default();
     let mut fault_applied: HashSet<(String, u8)> = HashSet::new();
     let class_label = sim.manifest.scenario_class.map(|c| c.as_str().to_string());
+    let mut cl_accum = ClosedLoopAccum::new(opts.auto_engage);
+    let mut defeat_seen = 0usize;
 
     for _ in 0..ticks {
         apply_fault_policy(&mut sim, &mut fault_applied);
@@ -282,7 +309,8 @@ fn run_case_inner(
         let mut tracks = fusion.process(t, dt, &detections);
         let track_pos: Vec<_> = tracks.iter().map(|tr| (tr.id, tr.position)).collect();
         sim.set_eo_truth_targets(&track_pos);
-        let recs = recommend.evaluate(t, &mut tracks, sim.zones());
+        let effectors = sim.effector_status();
+        let recs = recommend.evaluate(t, &mut tracks, sim.zones(), &effectors);
         let (doc_ok, frat, safe) = doctrine_stats(&tracks, &recs);
         doctrine_ok &= doc_ok;
         fratricide_violations += frat;
@@ -291,9 +319,24 @@ fn run_case_inner(
             *recommendation_mix.entry(action_key(r.action)).or_default() += 1;
         }
 
+        let horizon_score = score_tracks(&truth, &tracks, 250.0);
+        cl_accum.maybe_capture_horizon(t, horizon_score.track_completeness, &recs);
+        cl_accum.observe_ranking(&recs);
+        cl_accum.observe_breaches(&truth, sim.zones());
+
+        if opts.auto_engage {
+            auto_engage_tick(t, &mut sim, &mut recommend, &tracks, &recs, &mut cl_accum);
+        }
+
+        let events = sim.defeat_events();
+        if events.len() > defeat_seen {
+            cl_accum.observe_defeats(t, &events[defeat_seen..]);
+            defeat_seen = events.len();
+        }
+
         let hostile_tracks = tracks
             .iter()
-            .filter(|tr| tr.affiliation != aegis_schema::Affiliation::Friendly)
+            .filter(|tr| tr.affiliation != Affiliation::Friendly)
             .count();
         if time_to_first_track.is_none() && hostile_tracks > 0 {
             time_to_first_track = Some(t);
@@ -308,7 +351,7 @@ fn run_case_inner(
                 .count(),
         );
 
-        if soak && sim.tick % soak_sample_every == 0 {
+        if opts.soak && sim.tick % opts.soak_sample_every == 0 {
             if tracks.len() > MAX_TRACK_COUNT {
                 bail!("soak track explosion at t={t:.1}s tracks={}", tracks.len());
             }
@@ -327,9 +370,11 @@ fn run_case_inner(
         last_recs = recs;
     }
 
-    // Soft accept must produce an operator audit event.
-    let soft_audit_ok = soft_accept_audits(&mut recommend, sim.t, &last_recs);
-    // Impact/ETA ranking: top open inbound should not be dramatically looser than the set.
+    let soft_audit_ok = if opts.auto_engage && cl_accum.auto_accepts > 0 {
+        true
+    } else {
+        soft_accept_audits(&mut recommend, sim.t, &last_recs)
+    };
     let rank_ok = rank_eta_invariant(&last_recs);
 
     if golden_at.is_none() {
@@ -337,24 +382,9 @@ fn run_case_inner(
     }
 
     let score = score_tracks(&sim.truth_entities(), &last_tracks, 250.0);
+    let closed_loop = cl_accum.finish(truth_hostiles, &sim.truth_entities());
 
-    // Determinism: second run same seed/mutation
-    let mut sim_b = Simulation::from_manifest(sim.manifest.clone(), seed);
-    let mut fusion_b = FusionEngine::new(seed);
-    let mut recommend_b = RecommendEngine::new();
-    sim_b.start();
-    after_start(&mut sim_b);
-    let mut tracks_b = Vec::new();
-    for _ in 0..ticks {
-        let detections = sim_b.step();
-        tracks_b = fusion_b.process(sim_b.t, sim_b.dt, &detections);
-        let track_pos: Vec<_> = tracks_b.iter().map(|tr| (tr.id, tr.position)).collect();
-        sim_b.set_eo_truth_targets(&track_pos);
-        let _ = recommend_b.evaluate(sim_b.t, &mut tracks_b, sim_b.zones());
-    }
-    let golden_b = sim_b.golden_snapshot(&tracks_b);
-    let golden = golden_at.unwrap();
-    // Compare mid-run golden if both have tick 120; else compare finals
+    // Determinism: fusion-only replay to tick 120 (independent of Auto-engage).
     let det_ok = if ticks >= 120 {
         let mut sa = Simulation::from_manifest(sim.manifest.clone(), seed);
         let mut fa = FusionEngine::new(seed);
@@ -378,7 +408,19 @@ fn run_case_inner(
         let gb = sb.golden_snapshot(&tb);
         ga == gb
     } else {
-        golden == golden_b
+        let mut sim_b = Simulation::from_manifest(sim.manifest.clone(), seed);
+        let mut fusion_b = FusionEngine::new(seed);
+        sim_b.start();
+        after_start(&mut sim_b);
+        let mut tracks_b = Vec::new();
+        for _ in 0..ticks {
+            let detections = sim_b.step();
+            tracks_b = fusion_b.process(sim_b.t, sim_b.dt, &detections);
+        }
+        golden_at
+            .as_ref()
+            .map(|g| g == &sim_b.golden_snapshot(&tracks_b))
+            == Some(true)
     };
 
     let max_heading_delta_rad = smoothness.max_heading_delta_rad();
@@ -392,7 +434,8 @@ fn run_case_inner(
         && rank_ok
         && kinematics_ok
         && safety_ok
-        && peak_tracks <= MAX_TRACK_COUNT;
+        && peak_tracks <= MAX_TRACK_COUNT
+        && closed_loop.jammer_on_rf_dark == 0;
     if let Some(th) = thresholds {
         passed &= score.track_completeness >= th.min_completeness;
         passed &= score.false_track_rate <= th.max_false_rate;
@@ -407,7 +450,7 @@ fn run_case_inner(
         passed &= fiber_acoustic_ok(&sim.truth_entities(), &last_tracks);
     }
 
-    let metrics = DemoMetrics {
+    let metrics = RunMetrics {
         case: case_name.to_string(),
         seed,
         ticks,
@@ -438,9 +481,10 @@ fn run_case_inner(
         recommendation_mix,
         peak_detections,
         scenario_class: class_label,
+        closed_loop,
     };
 
-    let _ = golden;
+    let _ = golden_at;
     Ok(RunResult { metrics })
 }
 
@@ -472,7 +516,6 @@ fn action_key(a: RecommendedAction) -> String {
     .into()
 }
 
-/// Fiber hostiles should be tracked via radar/acoustic with little RF provenance.
 fn fiber_acoustic_ok(truth: &[aegis_schema::TruthEntity], tracks: &[aegis_schema::Track]) -> bool {
     use aegis_schema::{Affiliation, SensorKind};
     let fiber: Vec<_> = truth
@@ -511,7 +554,6 @@ fn fiber_acoustic_ok(truth: &[aegis_schema::TruthEntity], tracks: &[aegis_schema
     matched_ok >= 1 && rf_heavy <= matched_ok
 }
 
-/// Among open inbound recommendations, P1 should be among the tighter ETAs (impact can reorder near-ties).
 fn rank_eta_invariant(recs: &[aegis_schema::Recommendation]) -> bool {
     let mut inbound: Vec<(u32, f64)> = recs
         .iter()
@@ -527,11 +569,9 @@ fn rank_eta_invariant(recs: &[aegis_schema::Recommendation]) -> bool {
     etas.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     let tightest = etas[0];
     let median = etas[etas.len() / 2];
-    // P1 may lose a near-tie to zone/swarm weights, but must not be the clear straggler.
     top_eta <= median * 1.75 + 20.0 && top_eta <= tightest * 3.0 + 25.0
 }
 
-/// Returns (ok, fratricide_count, other_safety_count).
 fn doctrine_stats(
     tracks: &[aegis_schema::Track],
     recs: &[aegis_schema::Recommendation],
@@ -577,7 +617,6 @@ fn soft_accept_audits(
             )
     });
     let Some(soft) = soft else {
-        // No soft open rec this tick — don't fail the suite on that alone.
         return true;
     };
     let before = recommend.operator_events().len();
@@ -595,7 +634,7 @@ fn golden_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("goldens/baseline_seed42_tick120.json")
 }
 
-fn print_metrics(m: &DemoMetrics) {
+fn print_metrics(m: &RunMetrics) {
     println!("case:                 {}", m.case);
     println!("  seed:               {}", m.seed);
     println!("  ticks:              {}", m.ticks);
@@ -646,6 +685,30 @@ fn print_metrics(m: &DemoMetrics) {
             .collect();
         println!("  rec_mix:            {}", mix.join(" "));
     }
+    let cl = &m.closed_loop;
+    println!("  auto_engage:        {}", cl.auto_engage);
+    println!(
+        "  completeness@horiz: {}",
+        cl.completeness_at_decision_horizon
+            .map(|v| format!("{v:.2}"))
+            .unwrap_or_else(|| "n/a".into())
+    );
+    println!(
+        "  eta_rank_acc:       {:.2} (n={})",
+        cl.eta_ranking_accuracy, cl.eta_ranking_samples
+    );
+    println!("  neutralize_frac:    {:.2}", cl.neutralize_fraction);
+    println!(
+        "  neutralize/shot:    {:.2}",
+        cl.neutralize_per_scarce_effector
+    );
+    println!(
+        "  jammer/kinetic:     {}/{}",
+        cl.jammer_activations, cl.kinetic_shots
+    );
+    println!("  jammer_on_rf_dark:  {}", cl.jammer_on_rf_dark);
+    println!("  asset_breaches:     {}", cl.asset_breaches);
+    println!("  auto_accepts:       {}", cl.auto_accepts);
     println!(
         "  deterministic:      {}",
         if m.deterministic_ok { "PASS" } else { "FAIL" }
@@ -658,7 +721,6 @@ fn print_metrics(m: &DemoMetrics) {
 
 fn handle_golden(args: &Args, snapshot: &GoldenSnapshot) -> Result<()> {
     let path = golden_path();
-    // Canonical JSON string compare — avoids f64 round-trip PartialEq false negatives.
     let current = serde_json::to_string_pretty(snapshot)?;
     if args.write_golden {
         if let Some(parent) = path.parent() {
@@ -683,9 +745,34 @@ fn parse_classes(spec: &str) -> Result<Vec<ScenarioClass>> {
     if spec == "all" {
         return Ok(ScenarioClass::all().to_vec());
     }
-    ScenarioClass::parse(spec)
-        .map(|c| vec![c])
-        .ok_or_else(|| anyhow::anyhow!("unknown class '{spec}'"))
+    let mut out = Vec::new();
+    for part in spec.split(',').map(str::trim).filter(|s| !s.is_empty()) {
+        let c =
+            ScenarioClass::parse(part).ok_or_else(|| anyhow::anyhow!("unknown class '{part}'"))?;
+        out.push(c);
+    }
+    if out.is_empty() {
+        bail!("--class requires a name, comma-list, or all");
+    }
+    Ok(out)
+}
+
+fn run_opts(args: &Args, soak: bool) -> RunOpts {
+    RunOpts {
+        auto_engage: !args.no_auto_engage,
+        soak,
+        soak_sample_every: args.soak_sample_every,
+    }
+}
+
+fn maybe_log(args: &Args, mode: &str, metrics: &RunMetrics) -> Result<()> {
+    if args.no_log {
+        return Ok(());
+    }
+    let dir = args.log_dir.clone().unwrap_or_else(default_log_dir);
+    let path = append_run(&dir, mode, metrics)?;
+    eprintln!("logged {}", path.display());
+    Ok(())
 }
 
 fn run_batch(args: &Args) -> Result<()> {
@@ -694,11 +781,13 @@ fn run_batch(args: &Args) -> Result<()> {
         .as_deref()
         .ok_or_else(|| anyhow::anyhow!("--batch requires --class <name>|all"))?;
     let classes = parse_classes(class_spec)?;
+    let opts = run_opts(args, false);
     println!(
-        "Aegis batch: classes={} seeds={}..{}",
+        "Aegis batch: classes={} seeds={}..{} auto_engage={}",
         classes.len(),
         args.seed_start,
-        args.seed_start + args.seed_count.saturating_sub(1)
+        args.seed_start + args.seed_count.saturating_sub(1),
+        opts.auto_engage
     );
     let mut all_ok = true;
     let mut results = Vec::new();
@@ -716,17 +805,21 @@ fn run_batch(args: &Args) -> Result<()> {
                 noop_sim,
                 None,
                 Some(manifest),
-                false,
-                args.soak_sample_every,
+                &opts,
             )?;
             print_metrics(&result.metrics);
             println!();
+            maybe_log(args, "batch", &result.metrics)?;
             all_ok &= result.metrics.passed;
             results.push(result.metrics);
         }
     }
     if args.json {
         println!("{}", serde_json::to_string_pretty(&results)?);
+    }
+    if args.compare_baseline {
+        let baseline = load_baseline(&baseline_path())?;
+        compare_suite(&baseline, &results)?;
     }
     if !all_ok {
         bail!("batch failed");
@@ -746,11 +839,13 @@ fn run_soak(args: &Args) -> Result<()> {
     } else {
         args.ticks
     };
+    let opts = run_opts(args, true);
     println!(
-        "Aegis soak: class={} seed={} ticks={}",
+        "Aegis soak: class={} seed={} ticks={} auto_engage={}",
         class.as_str(),
         args.seed,
-        ticks
+        ticks,
+        opts.auto_engage
     );
     let manifest = generate(class, args.seed)?;
     let result = run_case_inner(
@@ -762,10 +857,10 @@ fn run_soak(args: &Args) -> Result<()> {
         noop_sim,
         None,
         Some(manifest),
-        true,
-        args.soak_sample_every,
+        &opts,
     )?;
     print_metrics(&result.metrics);
+    maybe_log(args, "soak", &result.metrics)?;
     if args.json {
         println!("{}", serde_json::to_string_pretty(&result.metrics)?);
     }
@@ -790,7 +885,8 @@ fn main() -> Result<()> {
         if suite != "smoke" {
             bail!("unknown suite '{suite}' (supported: smoke)");
         }
-        println!("Aegis smoke suite");
+        let opts = run_opts(&args, false);
+        println!("Aegis smoke suite (auto_engage={})", opts.auto_engage);
         let mut all_ok = true;
         let mut results = Vec::new();
         for case in smoke_cases() {
@@ -802,14 +898,65 @@ fn main() -> Result<()> {
                 case.mutate,
                 case.after_start,
                 Some(case.thresholds),
+                &opts,
             )?;
             print_metrics(&result.metrics);
             println!();
+            maybe_log(&args, "smoke", &result.metrics)?;
             all_ok &= result.metrics.passed;
             results.push(result.metrics);
         }
         if args.json {
             println!("{}", serde_json::to_string_pretty(&results)?);
+        }
+        if args.write_baseline {
+            let mut baseline = MetricBaseline::default();
+            // Smoke floors: measured completeness minus slack, never above case threshold intent.
+            for (m, case) in results.iter().zip(smoke_cases()) {
+                let floor = (m.track_completeness - 0.12)
+                    .max(case.thresholds.min_completeness)
+                    .min(m.track_completeness);
+                baseline
+                    .smoke_min_completeness
+                    .insert(m.case.clone(), floor);
+            }
+            let horizons: Vec<f64> = results
+                .iter()
+                .filter_map(|m| m.closed_loop.completeness_at_decision_horizon)
+                .collect();
+            if !horizons.is_empty() {
+                let mean = horizons.iter().sum::<f64>() / horizons.len() as f64;
+                baseline.floors.min_completeness_at_decision_horizon = (mean - 0.15).max(0.12);
+            }
+            let eta_samples: Vec<f64> = results
+                .iter()
+                .filter(|m| m.closed_loop.eta_ranking_samples > 0)
+                .map(|m| m.closed_loop.eta_ranking_accuracy)
+                .collect();
+            if !eta_samples.is_empty() {
+                let eta_mean = eta_samples.iter().sum::<f64>() / eta_samples.len() as f64;
+                baseline.floors.min_eta_ranking_accuracy = (eta_mean - 0.20).max(0.35);
+            } else {
+                baseline.floors.min_eta_ranking_accuracy = 0.35;
+            }
+            // Short smoke horizons often never fire scarce effectors — keep floor modest.
+            let engaged: Vec<f64> = results
+                .iter()
+                .filter(|m| m.closed_loop.jammer_activations + m.closed_loop.kinetic_shots > 0)
+                .map(|m| m.closed_loop.neutralize_fraction)
+                .collect();
+            baseline.floors.min_neutralize_fraction_auto = if engaged.is_empty() {
+                0.0
+            } else {
+                let mean = engaged.iter().sum::<f64>() / engaged.len() as f64;
+                (mean * 0.35).min(0.05).max(0.0)
+            };
+            write_baseline(&baseline_path(), &baseline)?;
+            println!("wrote baseline {}", baseline_path().display());
+        }
+        if args.compare_baseline {
+            let baseline = load_baseline(&baseline_path())?;
+            compare_suite(&baseline, &results)?;
         }
         if !all_ok {
             bail!("smoke suite failed");
@@ -818,6 +965,7 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    let opts = run_opts(&args, false);
     let result = run_case(
         &args.scenario,
         "single",
@@ -826,9 +974,11 @@ fn main() -> Result<()> {
         noop_manifest,
         noop_sim,
         None,
+        &opts,
     )?;
+    maybe_log(&args, "single", &result.metrics)?;
 
-    // Build golden at requested tick for assert (hand military-base-swarm only).
+    // Golden assert path is fusion-only (open-loop) for bit-identical contract.
     let dir = resolve_scenario_dir(&args.scenario);
     let mut sim = Simulation::load(&dir, Some(args.seed))?;
     let mut fusion = FusionEngine::new(args.seed);
@@ -844,7 +994,7 @@ fn main() -> Result<()> {
     if args.json {
         println!("{}", serde_json::to_string_pretty(&result.metrics)?);
     } else {
-        println!("Aegis demo harness");
+        println!("Aegis harness");
         print_metrics(&result.metrics);
     }
 

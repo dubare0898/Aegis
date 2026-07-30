@@ -424,6 +424,8 @@ pub struct AirPicture {
     pub speed: f64,
     pub seed: u64,
     pub scenario_id: String,
+    #[serde(default)]
+    pub scenario_class: Option<String>,
     pub detections: Vec<Detection>,
     pub tracks: Vec<Track>,
     pub recommendations: Vec<Recommendation>,
@@ -450,6 +452,12 @@ pub enum ClientCommand {
         speed: f64,
     },
     Reset {
+        seed: Option<u64>,
+    },
+    /// Load a seeded scenario class (regenerates manifest; pauses until Start).
+    SetScenarioClass {
+        class: String,
+        #[serde(default)]
         seed: Option<u64>,
     },
     CueEo {
@@ -694,7 +702,7 @@ pub struct FriendlyConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DemoMetrics {
+pub struct RunMetrics {
     pub case: String,
     pub seed: u64,
     pub ticks: u64,
@@ -739,6 +747,64 @@ pub struct DemoMetrics {
     pub peak_detections: usize,
     #[serde(default)]
     pub scenario_class: Option<String>,
+    /// Closed-loop Auto-engage KPIs (north stars).
+    #[serde(default)]
+    pub closed_loop: ClosedLoopMetrics,
+}
+
+/// Closed-loop Auto-engage / effector outcome KPIs for continuous improvement.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct ClosedLoopMetrics {
+    #[serde(default)]
+    pub auto_engage: bool,
+    /// Hostile track completeness when first mission-critical rec opened.
+    #[serde(default)]
+    pub completeness_at_decision_horizon: Option<f64>,
+    #[serde(default)]
+    pub decision_horizon_t: Option<f64>,
+    /// Fraction of ranking samples where P1 inbound MC is among the k-tightest ETAs.
+    #[serde(default)]
+    pub eta_ranking_accuracy: f64,
+    #[serde(default)]
+    pub eta_ranking_samples: usize,
+    /// Final neutralized hostiles / initial truth hostiles.
+    #[serde(default)]
+    pub neutralize_fraction: f64,
+    /// Sim time until first high-threat (inbound ETA) hostile neutralized.
+    #[serde(default)]
+    pub time_to_neutralize_high_eta_s: Option<f64>,
+    #[serde(default)]
+    pub jammer_activations: usize,
+    #[serde(default)]
+    pub kinetic_shots: usize,
+    /// Jammer activates against RF-dark truth (should stay ~0).
+    #[serde(default)]
+    pub jammer_on_rf_dark: usize,
+    /// Ticks where hostile truth was inside a critical asset zone while not neutralized.
+    #[serde(default)]
+    pub asset_breaches: usize,
+    /// Neutralized hostiles / (jammer activations + kinetic shots); 0 if no shots.
+    #[serde(default)]
+    pub neutralize_per_scarce_effector: f64,
+    #[serde(default)]
+    pub high_threat_neutralized: usize,
+    #[serde(default)]
+    pub auto_accepts: usize,
+}
+
+pub const HARNESS_RUN_SCHEMA_VERSION: u32 = 1;
+
+/// Durable JSONL record written by `aegis_harness` for trending.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HarnessRunRecord {
+    pub schema_version: u32,
+    #[serde(default)]
+    pub git_sha: Option<String>,
+    pub mode: String,
+    pub case: String,
+    pub seed: u64,
+    pub ticks: u64,
+    pub metrics: RunMetrics,
 }
 
 /// Compact snapshot for golden / bit-identical replay checks.

@@ -23,4 +23,5 @@
 - Env: `AEGIS_PORT` for the API listen port
 - Scenario id kept as `military-base-swarm` (domain pack id, not product rename)
 - Prose may still say **C-UAS** (counter-UAS domain term)
-- Do not document interactive WS class picker or KPI DB as shipped until they exist
+- Class picker over WS and JSONL `RunMetrics` logging are shipped; do not document a SQLite KPI DB as shipped until it exists
+- Prefer `aegis_harness` / `RunMetrics` naming — avoid “demo harness” / `DemoMetrics` in new prose

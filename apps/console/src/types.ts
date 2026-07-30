@@ -177,6 +177,7 @@ export type AirPicture = {
   speed: number
   seed: number
   scenario_id: string
+  scenario_class?: string | null
   detections: Detection[]
   tracks: Track[]
   recommendations: Recommendation[]
@@ -199,6 +200,7 @@ export type ClientCommand =
   | { type: 'pause' }
   | { type: 'set_speed'; speed: number }
   | { type: 'reset'; seed?: number }
+  | { type: 'set_scenario_class'; class: string; seed?: number }
   | { type: 'cue_eo'; track_id: string }
   | { type: 'fail_sensor'; sensor_id: string }
   | { type: 'restore_sensor'; sensor_id: string }
@@ -209,3 +211,12 @@ export type ClientCommand =
       actor?: OperatorActor
       reason_code?: DispositionReasonCode
     }
+
+export const SCENARIO_CLASSES = [
+  { id: 'direct_swarm_raid', label: 'Direct swarm raid' },
+  { id: 'mixed_rf_dark_raid', label: 'Mixed RF-dark raid' },
+  { id: 'decoy_screen', label: 'Decoy screen' },
+  { id: 'clutter_heavy_false_alarm_day', label: 'Clutter / false-alarm day' },
+  { id: 'friendly_crossing_with_hostile_ingress', label: 'Friendly crossing' },
+  { id: 'degraded_sensor_defense', label: 'Degraded sensor defense' },
+] as const

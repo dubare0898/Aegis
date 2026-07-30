@@ -31,4 +31,13 @@ jobs:
         run: cargo test --workspace
 
       - name: Smoke harness
-        run: cargo run -p demo_harness -- --suite smoke
+        run: cargo run -p aegis_harness -- --suite smoke --compare-baseline --no-log
+
+      - name: Golden assert
+        run: cargo run -p aegis_harness -- --assert-golden --no-auto-engage --no-log
+
+      - name: Class sample
+        run: >
+          cargo run -p aegis_harness -- --batch
+          --class mixed_rf_dark_raid,direct_swarm_raid
+          --seed-start 1 --seed-count 3 --ticks 250 --no-log

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Workspace reliability bar: unit tests + demo smoke + golden assert.
+# Workspace reliability bar: unit tests + smoke + golden + baseline compare.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,10 +9,10 @@ export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$ROOT/target}"
 echo "[check] cargo test --workspace"
 cargo test --workspace
 
-echo "[check] demo_harness --suite smoke"
-cargo run -p demo_harness -- --suite smoke
+echo "[check] aegis_harness --suite smoke --compare-baseline"
+cargo run -p aegis_harness -- --suite smoke --compare-baseline
 
-echo "[check] demo_harness --assert-golden"
-cargo run -p demo_harness -- --assert-golden
+echo "[check] aegis_harness --assert-golden"
+cargo run -p aegis_harness -- --assert-golden --no-auto-engage --no-log
 
 echo "[check] ok"

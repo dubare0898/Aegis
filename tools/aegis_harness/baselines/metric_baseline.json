@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "eps_completeness": 0.05,
+  "eps_eta_ranking": 0.1,
+  "eps_neutralize_per": 0.2,
+  "floors": {
+    "min_completeness_at_decision_horizon": 0.85,
+    "min_eta_ranking_accuracy": 0.35,
+    "max_jammer_on_rf_dark": 0,
+    "max_safety_violations": 0,
+    "min_neutralize_fraction_auto": 0.029166666666666664
+  },
+  "smoke_min_completeness": {
+    "baseline": 0.88,
+    "high_decoy": 0.88,
+    "high_fiber_acoustic": 0.88,
+    "large_swarm": 0.88,
+    "low_pd_radar": 0.88,
+    "radar_north_failed": 0.7966666666666666
+  }
+}

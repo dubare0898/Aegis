@@ -22,7 +22,7 @@ Use **4×** after Start so the raid reaches decision range inside the minute. Le
 | 55–75s | Soft path: Accept a **Cue EO** card (or HUD Cue EO on selected track). | EO joins provenance — recommend, not free-fire. |
 | 75–90s | Optional: **Fail radar-N** briefly, then **Restore**. Or toggle **Auto engage** once to show soak-style authorization without the modal. | Tracks coast under fault; Auto log line notes no Y/N. |
 
-**Reset 42** to replay the golden seed. **Random seed** for a different raid layout (same pack).
+**Reset 42** to replay the golden seed. **Random seed** for a different raid layout (same pack). Optional HUD **Class** loads a seeded scenario class over WS (pauses until Start).
 
 ## Do say
 
@@ -42,4 +42,4 @@ Use **4×** after Start so the raid reaches decision range inside the minute. Le
 ./scripts/check.sh
 ```
 
-Equivalent: `cargo test --workspace`, then `demo_harness --suite smoke` and `--assert-golden`.
+Equivalent: `cargo test --workspace`, then `aegis_harness --suite smoke --compare-baseline` and `--assert-golden`.

@@ -20,9 +20,9 @@
 - Multi-sensor simulation (radar, RF, EO/IR, ADS-B, acoustic) over a military FOB site pack
 - Deterministic fusion + threat scoring + recommendation engine (impact/ETA ranking to conserve jammer & kinetic; fiber ≠ jammer-first; friendlies never mission-critical)
 - Operator console: air picture with shape-aware legend glyphs, position lerp, ETA + rank rationale, batch **Engage high-level threats? Y/N**, HUD **Operator (Y/N)** / **Auto engage**, **Reset 42** + **Random seed**, enemies-downed log
-- Seeded scenario **classes** (raid mixes, clutter, faults, friendly crossing) via harness / `aegis_scenario` (API loads the site pack; no interactive class picker over WS yet)
-- Demo harness: golden replay, smoke suite, seed-batch metrics, long-run soak invariants
-- `./scripts/check.sh` — workspace tests + smoke + `--assert-golden`
+- Seeded scenario **classes** (raid mixes, clutter, faults, friendly crossing) via harness / `aegis_scenario` and interactive console/API class picker
+- `aegis_harness`: golden replay, smoke suite, Auto-engage closed-loop KPIs (`RunMetrics`), JSONL run logging under `runs/`, seed-batch + soak
+- `./scripts/check.sh` — workspace tests + smoke + baseline compare + `--assert-golden`
 
 ## Architecture
 
@@ -37,7 +37,7 @@ scenarios/ ──► aegis_scenario (generate) ──► ScenarioManifest
                       │
           ┌───────────┴───────────┐
           ▼                       ▼
-     aegis_api (WS)          demo_harness
+     aegis_api (WS)          aegis_harness
           ▼
    apps/console (+ optional Tauri desktop)
 ```
@@ -55,7 +55,7 @@ scenarios/ ──► aegis_scenario (generate) ──► ScenarioManifest
 | `apps/console` | React operator UI |
 | `apps/desktop` | Optional Tauri shell |
 | `scenarios/` | Site packs (golden: `military-base-swarm`) |
-| `tools/demo_harness` | Golden, smoke, batch, soak |
+| `tools/aegis_harness` | Golden, smoke, batch, soak, JSONL `RunMetrics` |
 | `DEMO.md` | 90-second evaluator script |
 
 ## Quickstart (native — primary)
@@ -68,8 +68,8 @@ cd aegis   # or whatever you named the clone
 
 # Headless reliability bar
 CARGO_TARGET_DIR="$PWD/target" cargo test --workspace
-CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --suite smoke
-CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --assert-golden
+CARGO_TARGET_DIR="$PWD/target" cargo run -p aegis_harness -- --suite smoke
+CARGO_TARGET_DIR="$PWD/target" cargo run -p aegis_harness -- --assert-golden
 
 # Desktop (rebuilds console dist when src is newer; serves static dist)
 ./scripts/launch-desktop.sh
@@ -86,11 +86,13 @@ Desktop/`prepare-desktop-resources.sh` serve the built `apps/console/dist`. Afte
 
 Prefer `CARGO_TARGET_DIR="$PWD/target"` so builds stay inside the repo.
 
-Quick validation bar (tests + smoke + golden):
+Quick validation bar (tests + smoke + baseline compare + golden):
 
 ```bash
 ./scripts/check.sh
 ```
+
+Harness runs append `RunMetrics` JSONL under `runs/` by default. Compare against committed floors with `--compare-baseline`.
 
 ## Optional Docker (headless reproducibility)
 
@@ -99,7 +101,7 @@ Containerize the **API + harness** (and a baked static console) for onboarding/C
 | In the image | Not in Docker |
 |--------------|---------------|
 | `aegis_api` on `0.0.0.0:8080` | Tauri / `./scripts/launch-desktop.sh` |
-| `demo_harness` (smoke / batch / soak) | Hot-reload `npm run dev` |
+| `aegis_harness` (smoke / batch / soak) | Hot-reload `npm run dev` |
 | `scenarios/` + optional console `dist` | Day-to-day Rust edit/rebuild loop |
 
 ```bash
@@ -118,17 +120,17 @@ docker compose run --rm harness --soak --class direct_swarm_raid --seed 3 --tick
 docker compose build --build-arg BUILD_CONSOLE=0
 ```
 
-**Tradeoffs:** first image build is slow (Rust release + optional Node). Console in the image is static (no HMR). Desktop stays native-only. Primary CI remains native `cargo test` + smoke; Docker is optional locally.
+**Tradeoffs:** first image build is slow (Rust release + optional Node). Console in the image is static (no HMR). Desktop stays native-only. Primary CI remains native `cargo test` + smoke + golden + class sample; Docker is optional locally.
 
-## Demo, batch, and soak
+## Evaluator script, batch, and soak
 
 | Goal | Native | Docker |
 |------|--------|--------|
 | 90s script | [DEMO.md](DEMO.md) after `./scripts/launch-desktop.sh` | Browser at `http://localhost:8080` after `docker compose up api` |
-| Smoke matrix | `cargo run -p demo_harness -- --suite smoke` | `docker compose run --rm harness --suite smoke` |
-| Golden (seed 42) | `cargo run -p demo_harness -- --assert-golden` | Prefer native (goldens not required for smoke/batch/soak) |
-| Batch classes | `cargo run -p demo_harness -- --batch --class all --seed-start 1 --seed-count 3 --ticks 400` | `docker compose run --rm harness --batch …` |
-| Soak | `cargo run -p demo_harness -- --soak --class direct_swarm_raid --seed 3 --ticks 20000` | `docker compose run --rm harness --soak …` |
+| Smoke + baseline | `cargo run -p aegis_harness -- --suite smoke --compare-baseline` | `docker compose run --rm harness --suite smoke` |
+| Golden (seed 42) | `cargo run -p aegis_harness -- --assert-golden --no-auto-engage` | Prefer native (goldens not required for smoke/batch/soak) |
+| Batch classes | `cargo run -p aegis_harness -- --batch --class all --seed-start 1 --seed-count 3 --ticks 400` | `docker compose run --rm harness --batch …` |
+| Soak | `cargo run -p aegis_harness -- --soak --class direct_swarm_raid --seed 3 --ticks 20000` | `docker compose run --rm harness --soak …` |
 
 ## Deterministic scenario generation
 
@@ -154,9 +156,8 @@ The hand-authored `scenarios/military-base-swarm` pack + seed **42** remains the
 
 ## Roadmap (near-term)
 
-- Durable KPI / run logging (JSONL + SQLite) for demo and soak runs
-- Interactive scenario class picker over the API/WebSocket (harness already exercises classes)
-- Stronger batch reporting / CI class sample
+- SQLite query layer over JSONL run logs (trending dashboards)
+- Tighten smoke floors from sustained north-star wins
 - Live-sensor adapter spike (read-only) behind a feature flag
 
 ## License / contributing / security

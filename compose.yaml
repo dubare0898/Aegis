@@ -24,7 +24,7 @@ services:
         BUILD_CONSOLE: "1"
     profiles: ["harness"]
     working_dir: /app
-    entrypoint: ["demo_harness"]
+    entrypoint: ["aegis_harness"]
     # Override args, e.g.:
     #   docker compose run --rm harness --suite smoke
     #   docker compose run --rm harness --batch --class mixed_rf_dark_raid --seed-start 1 --seed-count 3 --ticks 400

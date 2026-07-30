@@ -13,6 +13,7 @@ aegis_schema = { workspace = true }
 aegis_sim = { workspace = true }
 aegis_fusion = { workspace = true }
 aegis_recommend = { workspace = true }
+aegis_scenario = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }

@@ -12,6 +12,7 @@ import type {
   TrackStatus,
   ZoneState,
 } from './types'
+import { SCENARIO_CLASSES } from './types'
 
 /** Batch high-threat prompt thresholds (sim seconds / threat score). */
 const HIGH_THREAT_SCORE = 48
@@ -565,6 +566,27 @@ export default function App() {
             >
               Random seed
             </button>
+            <label className="hud-class">
+              <span className="hud-class-label">Class</span>
+              <select
+                value={picture?.scenario_class ?? ''}
+                title="Load a seeded scenario class (pauses until Start)"
+                onChange={(e) => {
+                  const cls = e.target.value
+                  if (!cls) return
+                  clearPromptState()
+                  send({ type: 'set_scenario_class', class: cls, seed: picture?.seed ?? 42 })
+                  pushLocalLog(`Scenario class — ${cls} (seed ${picture?.seed ?? 42})`)
+                }}
+              >
+                <option value="">site pack</option>
+                {SCENARIO_CLASSES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button onClick={cueSelected} disabled={!selectedId}>
               Cue EO
             </button>
@@ -718,6 +740,7 @@ export default function App() {
                 track={tr}
                 active={selectedId === tr.id}
                 onSelect={() => setSelectedId(tr.id)}
+                outcome={trackOutcome(tr.id, effectors, defeatEvents, serverEvents)}
               />
             ))}
           </section>
@@ -865,14 +888,34 @@ function DefeatRow({ event }: { event: DefeatEvent }) {
   )
 }
 
+function trackOutcome(
+  trackId: string,
+  effectors: EffectorStatus[],
+  defeats: DefeatEvent[],
+  events: OperatorEvent[],
+): string | null {
+  const tasked = effectors.find((e) => e.tasked_track_id === trackId && e.last_result)
+  if (tasked?.last_result) {
+    return `${tasked.kind}: ${tasked.last_result}`
+  }
+  const ev = events.find((e) => e.track_id === trackId && e.disposition === 'accepted')
+  if (ev?.note) return ev.note
+  // Defeat events are keyed by truth id; show nearest recent note when track was engaged.
+  const recent = [...defeats].reverse().find((d) => d.note && d.t > 0)
+  if (recent && tasked) return `${recent.cause}: ${recent.note || 'effect applied'}`
+  return null
+}
+
 function TrackRow({
   track: tr,
   active,
   onSelect,
+  outcome,
 }: {
   track: Track
   active: boolean
   onSelect: () => void
+  outcome: string | null
 }) {
   const status = tr.track_status ?? 'tentative'
   const zone = tr.zone_state ?? 'outside'
@@ -896,6 +939,11 @@ function TrackRow({
           {tr.sensor_provenance.map((k) => SENSOR_LABEL[k] ?? k).join('+') || '—'} · hits{' '}
           {tr.hit_count} · {formatEta(tr.eta_s)}
         </div>
+        {outcome && (
+          <div className="track-outcome" style={{ color: 'var(--warn)', fontSize: '0.62rem' }}>
+            Outcome: {outcome}
+          </div>
+        )}
       </div>
       <div className="score">{tr.threat_score.toFixed(0)}</div>
     </div>

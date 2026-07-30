@@ -69,26 +69,35 @@ impl FusionEngine {
             tr.t = t;
         }
 
-        let mut unused: Vec<usize> = (0..detections.len()).collect();
-
-        let mut assignments: Vec<(usize, usize)> = Vec::new();
+        // Global greedy: sort candidate pairs by cost so dense swarms don't
+        // let early tracks monopolize nearby detections.
+        let mut pairs: Vec<(usize, usize, f64)> = Vec::new();
         for (ti, tr) in self.tracks.iter().enumerate() {
-            let mut best: Option<(usize, f64)> = None;
-            for &di in &unused {
-                let d = &detections[di];
+            for (di, d) in detections.iter().enumerate() {
                 if !associable(tr, d, self.gate_m) {
                     continue;
                 }
-                let dist = association_cost(tr, d);
-                if best.map(|(_, bd)| dist < bd).unwrap_or(true) {
-                    best = Some((di, dist));
-                }
-            }
-            if let Some((di, _)) = best {
-                assignments.push((ti, di));
-                unused.retain(|x| *x != di);
+                let cost = association_cost(tr, d);
+                pairs.push((ti, di, cost));
             }
         }
+        pairs.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal));
+        let mut used_tracks = vec![false; self.tracks.len()];
+        let mut used_dets = vec![false; detections.len()];
+        let mut assignments: Vec<(usize, usize)> = Vec::new();
+        for (ti, di, _) in pairs {
+            if used_tracks[ti] || used_dets[di] {
+                continue;
+            }
+            used_tracks[ti] = true;
+            used_dets[di] = true;
+            assignments.push((ti, di));
+        }
+        let unused: Vec<usize> = used_dets
+            .iter()
+            .enumerate()
+            .filter_map(|(i, u)| if !*u { Some(i) } else { None })
+            .collect();
 
         for (ti, di) in assignments {
             let d = &detections[di];
@@ -267,21 +276,30 @@ impl FusionEngine {
     }
 }
 
+fn sensor_gate_scale(kind: SensorKind) -> f64 {
+    match kind {
+        SensorKind::Adsb => 1.5,
+        SensorKind::Acoustic => 2.6,
+        SensorKind::EoIr => 0.85,
+        SensorKind::Rf => 1.15,
+        SensorKind::Radar => 1.0,
+    }
+}
+
 fn associable(tr: &InternalTrack, d: &Detection, gate_m: f64) -> bool {
     let dist = hypot3(
         tr.x - d.position.x,
         tr.y - d.position.y,
         tr.z - d.position.z,
     );
+    let gate = gate_m * sensor_gate_scale(d.sensor_kind);
     match d.sensor_kind {
-        SensorKind::Adsb => dist <= gate_m * 1.5,
+        SensorKind::Adsb => dist <= gate,
         SensorKind::Acoustic => {
-            // Loose range + bearing gate (acoustic is bearing-heavy).
-            if dist > gate_m * 2.6 {
+            if dist > gate {
                 return false;
             }
             if let Some(brg) = d.bearing_rad {
-                // Approximate sensor origin behind the detection along its bearing.
                 let range = d.range_m.unwrap_or(dist.max(1.0));
                 let sx = d.position.x - range * brg.cos();
                 let sy = d.position.y - range * brg.sin();
@@ -290,13 +308,33 @@ fn associable(tr: &InternalTrack, d: &Detection, gate_m: f64) -> bool {
                 if d_ang > std::f64::consts::PI {
                     d_ang = std::f64::consts::TAU - d_ang;
                 }
-                d_ang <= 0.45 // ~26 deg
-            } else {
-                true
+                if d_ang > 0.45 {
+                    return false;
+                }
             }
+            velocity_consistent(tr, d)
         }
-        _ => dist <= gate_m,
+        _ => dist <= gate && velocity_consistent(tr, d),
     }
+}
+
+/// Reject associations whose reported velocity disagrees sharply with the track.
+fn velocity_consistent(tr: &InternalTrack, d: &Detection) -> bool {
+    let Some(v) = d.velocity else {
+        return true;
+    };
+    let tr_speed = (tr.vx * tr.vx + tr.vy * tr.vy).sqrt();
+    let d_speed = (v.x * v.x + v.y * v.y).sqrt();
+    // Young / coasting tracks: skip velocity gate.
+    if tr.hit_count < 3 || tr.coast_ticks > 8 {
+        return true;
+    }
+    if tr_speed < 5.0 && d_speed < 5.0 {
+        return true;
+    }
+    let dv = hypot3(tr.vx - v.x, tr.vy - v.y, tr.vz - v.z);
+    // Allow large innov under maneuver; block only clear mismatches.
+    dv <= 55.0 + 0.35 * tr_speed.max(d_speed)
 }
 
 fn association_cost(tr: &InternalTrack, d: &Detection) -> f64 {
@@ -305,6 +343,13 @@ fn association_cost(tr: &InternalTrack, d: &Detection) -> f64 {
         tr.y - d.position.y,
         tr.z - d.position.z,
     );
+    let mut cost = dist;
+    if let Some(v) = d.velocity {
+        if tr.hit_count >= 3 {
+            let dv = hypot3(tr.vx - v.x, tr.vy - v.y, tr.vz - v.z);
+            cost += dv * 0.45;
+        }
+    }
     if d.sensor_kind == SensorKind::Acoustic {
         if let Some(brg) = d.bearing_rad {
             let range = d.range_m.unwrap_or(dist.max(1.0));
@@ -315,11 +360,14 @@ fn association_cost(tr: &InternalTrack, d: &Detection) -> f64 {
             if d_ang > std::f64::consts::PI {
                 d_ang = std::f64::consts::TAU - d_ang;
             }
-            // Prefer angle agreement over raw Euclidean for acoustic.
-            return dist * 0.35 + d_ang * 400.0;
+            return dist * 0.35 + d_ang * 400.0 + (cost - dist);
         }
     }
-    dist
+    // Slight preference for multi-sensor corroboration continuity.
+    if tr.sensors.contains(&d.sensor_kind) {
+        cost *= 0.92;
+    }
+    cost
 }
 
 fn hypot3(x: f64, y: f64, z: f64) -> f64 {

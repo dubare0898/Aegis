@@ -4,8 +4,9 @@
 
 - [ ] `cargo fmt --check`
 - [ ] `CARGO_TARGET_DIR="$PWD/target" cargo test --workspace`
-- [ ] `CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --suite smoke`
+- [ ] `CARGO_TARGET_DIR="$PWD/target" cargo run -p aegis_harness -- --suite smoke --compare-baseline`
 - [ ] Golden checked or intentionally updated (`--assert-golden` / `--write-golden`)
+- [ ] If KPI floors moved intentionally: baseline updated (`--write-baseline`)
 
 ## Notes
 

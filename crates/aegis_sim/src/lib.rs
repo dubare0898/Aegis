@@ -47,6 +47,10 @@ pub struct Simulation {
     clutter_pool: Vec<ClutterPoint>,
     effectors: EffectorSuite,
     pub last_detections: Vec<Detection>,
+    /// Soft Accept: AlertSector raises sensor attention (Pd) for a window.
+    attention_boost_until: f64,
+    /// Soft Accept: EvacuatePad moves friendlies clear of the pad.
+    pad_evacuated: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -154,6 +158,8 @@ impl Simulation {
             clutter_pool,
             effectors,
             last_detections: Vec::new(),
+            attention_boost_until: 0.0,
+            pad_evacuated: false,
         }
     }
 
@@ -245,6 +251,34 @@ impl Simulation {
         self.effectors.defeat_events()
     }
 
+    /// Soft Accept: raise radar/acoustic/RF Pd briefly (operator alerted the sector).
+    pub fn apply_alert_sector(&mut self) {
+        self.attention_boost_until = self.t + 45.0;
+    }
+
+    /// Soft Accept: evacuate pad friendlies outward from origin.
+    pub fn apply_evacuate_pad(&mut self) {
+        self.pad_evacuated = true;
+        for f in &mut self.friendlies {
+            let r = f.position.magnitude_xy().max(80.0);
+            let scale = (r + 400.0) / r;
+            f.position.x *= scale;
+            f.position.y *= scale;
+            // Push them further out over subsequent steps.
+            let brg = f.position.y.atan2(f.position.x);
+            f.velocity.x = 18.0 * brg.cos();
+            f.velocity.y = 18.0 * brg.sin();
+        }
+    }
+
+    pub fn pad_evacuated(&self) -> bool {
+        self.pad_evacuated
+    }
+
+    pub fn attention_active(&self) -> bool {
+        self.t < self.attention_boost_until
+    }
+
     pub fn step(&mut self) -> Vec<Detection> {
         if !self.running {
             return self.last_detections.clone();
@@ -270,7 +304,15 @@ impl Simulation {
             .filter(|m| !m.neutralized)
             .collect();
 
+        let attention = self.t < self.attention_boost_until;
         for sensor in &mut self.sensors {
+            let base_pd = sensor.config.pd;
+            let base_pfa = sensor.config.pfa;
+            if attention {
+                // Alerted sector: operators lean on sensors — higher Pd, slightly higher Pfa.
+                sensor.config.pd = (base_pd * 1.12).clamp(0.05, 0.99);
+                sensor.config.pfa = (base_pfa * 1.15).clamp(0.0, 0.55);
+            }
             let mut batch = sensor.sense(
                 self.t,
                 self.dt,
@@ -281,6 +323,8 @@ impl Simulation {
                 &mut self.rng,
                 &mut self.ids,
             );
+            sensor.config.pd = base_pd;
+            sensor.config.pfa = base_pfa;
             detections.append(&mut batch);
         }
 

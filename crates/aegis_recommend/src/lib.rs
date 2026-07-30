@@ -1,8 +1,8 @@
 use aegis_schema::{
-    Affiliation, Criticality, DispositionReasonCode, EvidenceItem, OperatorActor,
-    OperatorDisposition, OperatorEvent, OperatorState, Recommendation, RecommendationStatus,
-    RecommendedAction, RecommendedBy, SensorKind, Track, TrackClass, Vec3, Zone, ZoneKind,
-    ZoneState,
+    Affiliation, Criticality, DispositionReasonCode, EffectorKind, EffectorStatus, EvidenceItem,
+    OperatorActor, OperatorDisposition, OperatorEvent, OperatorState, Recommendation,
+    RecommendationStatus, RecommendedAction, RecommendedBy, SensorKind, Track, TrackClass, Vec3,
+    Zone, ZoneKind, ZoneState,
 };
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
@@ -284,6 +284,7 @@ impl RecommendEngine {
         t: f64,
         tracks: &mut [Track],
         zones: &[Zone],
+        effectors: &[EffectorStatus],
     ) -> Vec<Recommendation> {
         // Drop expired suppressions
         self.suppress.retain(|_, s| t < s.until_t);
@@ -390,6 +391,17 @@ impl RecommendEngine {
                 .then_with(|| a.id.cmp(&b.id))
         });
 
+        let (ready_jammer, ready_kinetic) = ready_effector_slots(effectors);
+        let effector_cap = if effectors.is_empty() {
+            MAX_OPEN_MISSION_CRITICAL
+        } else {
+            (ready_jammer + ready_kinetic)
+                .max(1)
+                .min(MAX_OPEN_MISSION_CRITICAL)
+        };
+        let mut open_jammer = 0usize;
+        let mut open_kinetic = 0usize;
+
         let mut recs = Vec::new();
         let mut open_mission_critical = 0usize;
         for tr in ranked.iter().take(8) {
@@ -410,15 +422,86 @@ impl RecommendEngine {
                 continue;
             }
 
-            // Cap concurrent open jammer/kinetic — prefer one high-priority effector over many mid-tier.
+            // Effector-state triage against live ready/cooldown status.
+            if !effectors.is_empty() {
+                let fiber = tr.rf_dark || tr.class_hypothesis == TrackClass::FiberOpticUas;
+                match action {
+                    RecommendedAction::RequestJammerAuthorization if fiber && ready_kinetic > 0 => {
+                        action = RecommendedAction::EngageKinetic;
+                        title = format!(
+                            "Engage kinetic — RF-dark; jammer ineffective on {}",
+                            short_id(tr.id)
+                        );
+                        rationale
+                            .push("Effector state: RF-dark — kinetic preferred over jammer".into());
+                    }
+                    RecommendedAction::RequestJammerAuthorization if ready_jammer == 0 => {
+                        if ready_kinetic > 0 {
+                            action = RecommendedAction::EngageKinetic;
+                            title =
+                                format!("Engage kinetic — jammer cooldown on {}", short_id(tr.id));
+                            rationale.push(
+                                "Effector state: jammer not ready — kinetic substitution".into(),
+                            );
+                        } else {
+                            let soft = conserve_soft_alternative(tr, keep_out);
+                            action = soft.0;
+                            title = soft.1;
+                            rationale.push(
+                                "No jammer/kinetic ready — soft action until cooldown clears"
+                                    .into(),
+                            );
+                        }
+                    }
+                    RecommendedAction::EngageKinetic if ready_kinetic == 0 => {
+                        if ready_jammer > 0 && !fiber {
+                            action = RecommendedAction::RequestJammerAuthorization;
+                            title = format!(
+                                "Authorize soft-kill — kinetic cooldown on {}",
+                                short_id(tr.id)
+                            );
+                            rationale.push(
+                                "Effector state: kinetic not ready — jammer substitution".into(),
+                            );
+                        } else {
+                            let soft = conserve_soft_alternative(tr, keep_out);
+                            action = soft.0;
+                            title = soft.1;
+                            rationale.push(
+                                "No kinetic ready — soft action until cooldown clears".into(),
+                            );
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            // Cap concurrent open jammer/kinetic — prefer high-priority over many mid-tier.
             let provisional_key = ActionKey {
                 track_id: tr.id,
                 action,
             };
             let already_resolved = self.accepted.contains_key(&provisional_key);
+            let type_cap_hit = match action {
+                RecommendedAction::RequestJammerAuthorization
+                    if !already_resolved
+                        && !effectors.is_empty()
+                        && open_jammer >= ready_jammer =>
+                {
+                    true
+                }
+                RecommendedAction::EngageKinetic
+                    if !already_resolved
+                        && !effectors.is_empty()
+                        && open_kinetic >= ready_kinetic =>
+                {
+                    true
+                }
+                _ => false,
+            };
             if is_mission_critical(action)
                 && !already_resolved
-                && open_mission_critical >= MAX_OPEN_MISSION_CRITICAL
+                && (open_mission_critical >= effector_cap || type_cap_hit)
             {
                 let soft = conserve_soft_alternative(tr, keep_out);
                 action = soft.0;
@@ -466,6 +549,11 @@ impl RecommendEngine {
             }
             if is_mission_critical(action) && status == RecommendationStatus::Open {
                 open_mission_critical += 1;
+                match action {
+                    RecommendedAction::RequestJammerAuthorization => open_jammer += 1,
+                    RecommendedAction::EngageKinetic => open_kinetic += 1,
+                    _ => {}
+                }
             }
 
             let rank = build_rank_rationale(tr, closing);
@@ -690,6 +778,21 @@ fn conserve_soft_alternative(tr: &Track, keep_out: Option<&Zone>) -> (Recommende
             "Maintain watch — conserve jammer/kinetic capacity".into(),
         )
     }
+}
+
+fn ready_effector_slots(effectors: &[EffectorStatus]) -> (usize, usize) {
+    let mut jammer = 0usize;
+    let mut kinetic = 0usize;
+    for e in effectors {
+        if e.active || e.cooldown_remaining_s > 0.05 {
+            continue;
+        }
+        match e.kind {
+            EffectorKind::Jammer => jammer += 1,
+            EffectorKind::Kinetic => kinetic += 1,
+        }
+    }
+    (jammer, kinetic)
 }
 
 fn decide_action(
@@ -936,7 +1039,7 @@ mod tests {
     fn scores_inbound_hostile() {
         let mut eng = RecommendEngine::new();
         let mut tracks = vec![sample_track(Uuid::new_v4(), false)];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         assert!(!recs.is_empty());
         assert!(tracks[0].threat_score > 40.0);
     }
@@ -947,7 +1050,7 @@ mod tests {
         let mut tracks = vec![sample_track(Uuid::new_v4(), true)];
         tracks[0].position = Vec3::new(600.0, 0.0, 100.0);
         tracks[0].class_confidence = 0.78;
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         assert!(!recs.is_empty());
         assert_ne!(
             recs[0].action,
@@ -961,7 +1064,7 @@ mod tests {
         let mut eng = RecommendEngine::new();
         let id = Uuid::new_v4();
         let mut tracks = vec![sample_track(id, false)];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let rec = recs[0].clone();
         let action = rec.action;
         eng.dispose(
@@ -972,7 +1075,7 @@ mod tests {
             Some(DispositionReasonCode::FalsePositiveSuspected),
         )
         .expect("dispose");
-        let recs2 = eng.evaluate(12.0, &mut tracks, &zones());
+        let recs2 = eng.evaluate(12.0, &mut tracks, &zones(), &[]);
         assert!(
             recs2
                 .iter()
@@ -989,7 +1092,7 @@ mod tests {
         tracks[0].sensor_provenance = vec![SensorKind::Radar];
         tracks[0].class_confidence = 0.3;
         tracks[0].position = Vec3::new(2500.0, 0.0, 100.0);
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let cue = recs
             .iter()
             .find(|r| r.action == RecommendedAction::CueEo)
@@ -1026,7 +1129,7 @@ mod tests {
             threat_score: 99.0,
             ..sample_track(id, false)
         }];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         assert!(
             recs.iter().all(|r| !is_mission_critical(r.action)),
             "friendly must not get jammer/kinetic"
@@ -1040,7 +1143,7 @@ mod tests {
         tracks[0].position = Vec3::new(500.0, 0.0, 80.0);
         tracks[0].class_confidence = 0.8;
         tracks[0].sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let critical = recs.iter().find(|r| is_mission_critical(r.action));
         if let Some(c) = critical {
             assert!(c.requires_confirmation);
@@ -1065,7 +1168,7 @@ mod tests {
         far.velocity = Vec3::new(-20.0, 0.0, 0.0);
         far.sensor_provenance = vec![SensorKind::Radar, SensorKind::Rf];
         let mut tracks = vec![far, near];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let near_tr = tracks.iter().find(|t| t.id == near_id).unwrap();
         let far_tr = tracks.iter().find(|t| t.id == far_id).unwrap();
         assert!(near_tr.eta_s.is_some() && far_tr.eta_s.is_some());
@@ -1103,7 +1206,7 @@ mod tests {
         outbound.position = Vec3::new(1200.0, 0.0, 80.0);
         outbound.velocity = Vec3::new(35.0, 0.0, 0.0);
         let mut tracks = vec![outbound, inbound];
-        eng.evaluate(10.0, &mut tracks, &zones());
+        eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let in_tr = tracks.iter().find(|t| t.id == inbound_id).unwrap();
         let out_tr = tracks.iter().find(|t| t.id == outbound_id).unwrap();
         assert!(in_tr.eta_s.is_some());
@@ -1120,7 +1223,7 @@ mod tests {
         tracks[0].velocity = Vec3::new(-22.0, 0.0, 0.0);
         tracks[0].class_confidence = 0.8;
         tracks[0].sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         assert!(!recs.is_empty());
         assert!(tracks[0].eta_s.unwrap() > ETA_SOFT_FIRST_S);
         assert!(tracks[0].position.distance(&Vec3::zero()) >= SOFT_FIRST_MIN_DIST_M);
@@ -1147,7 +1250,7 @@ mod tests {
         tracks[0].velocity = Vec3::new(-42.0, 0.0, 0.0);
         tracks[0].class_confidence = 0.8;
         tracks[0].sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         assert!(!recs.is_empty());
         let eta = tracks[0].eta_s.expect("inbound eta");
         assert!(
@@ -1177,7 +1280,7 @@ mod tests {
         tb.class_confidence = 0.85;
         tb.sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
         let mut tracks = vec![ta, tb];
-        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        let recs = eng.evaluate(10.0, &mut tracks, &zones(), &[]);
         let open_critical = recs
             .iter()
             .filter(|r| r.status == RecommendationStatus::Open && is_mission_critical(r.action))

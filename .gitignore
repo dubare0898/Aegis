@@ -51,3 +51,6 @@ apps/desktop/src-tauri/resources/scenarios/
 # Generated / local desktop install
 *.desktop.local
 /scripts/*.desktop.installed
+
+# Harness KPI logs (local)
+runs/

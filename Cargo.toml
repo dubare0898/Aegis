@@ -7,7 +7,7 @@ members = [
   "crates/aegis_recommend",
   "crates/aegis_scenario",
   "crates/aegis_api",
-  "tools/demo_harness",
+  "tools/aegis_harness",
 ]
 exclude = [
   "apps/desktop/src-tauri",

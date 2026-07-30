@@ -719,16 +719,16 @@
       "id": "3c6ef372-fe94-f800-0000-000000000000",
       "t": 5.999999999999987,
       "position": {
-        "x": -2577.528138346134,
-        "y": -1749.3333254289055,
-        "z": 110.30696586917344
+        "x": -2363.9299850884277,
+        "y": -1658.983808667115,
+        "z": 189.38523128738643
       },
       "velocity": {
-        "x": 1.9115373086915,
-        "y": -111.1584745641742,
-        "z": -4.041149491185018
+        "x": 39.229189983423844,
+        "y": 19.211113674051056,
+        "z": 2.735542765093666
       },
-      "covariance_trace": 4.199999999999998,
+      "covariance_trace": 12.491724287999997,
       "class_hypothesis": "multirotor",
       "class_confidence": 0.55,
       "affiliation": "hostile",
@@ -738,12 +738,12 @@
         "radar",
         "rf"
       ],
-      "hit_count": 55,
-      "coast_ticks": 0,
+      "hit_count": 23,
+      "coast_ticks": 5,
       "age_s": 5.749999999999987,
       "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
+      "track_status": "coasting",
+      "last_update_t": 5.749999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
       "identity_basis": "rf_signature",
@@ -753,219 +753,49 @@
       "id": "3c6ef372-fe94-f800-0000-000000000001",
       "t": 5.999999999999987,
       "position": {
-        "x": -2640.9258859626925,
-        "y": -1714.4940998501836,
-        "z": 123.50190718508769
+        "x": -2339.3895730144914,
+        "y": -1564.9800194536324,
+        "z": 196.31523044669797
       },
       "velocity": {
-        "x": 6.745700323510927,
-        "y": 2.2805556945897387,
-        "z": -4.982579738439201
+        "x": 23.584060888615834,
+        "y": 16.243587436472307,
+        "z": 4.833643898713461
       },
-      "covariance_trace": 4.199999999999998,
-      "class_hypothesis": "multirotor",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
+      "covariance_trace": 16.799999999999994,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.72,
+      "affiliation": "unknown",
       "threat_score": 0.0,
       "sensor_provenance": [
         "acoustic",
-        "radar",
-        "rf"
+        "radar"
       ],
-      "hit_count": 53,
-      "coast_ticks": 0,
+      "hit_count": 22,
+      "coast_ticks": 15,
       "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
+      "rf_dark": true,
+      "track_status": "coasting",
+      "last_update_t": 5.249999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
-      "identity_basis": "rf_signature",
+      "identity_basis": "unknown",
       "eta_s": null
     },
     {
       "id": "3c6ef372-fe94-f800-0000-000000000002",
       "t": 5.999999999999987,
       "position": {
-        "x": -2463.815986095086,
-        "y": -1863.735426672888,
-        "z": 129.30693730369805
+        "x": -2382.925377773026,
+        "y": -1710.8821740488372,
+        "z": 209.94394834683598
       },
       "velocity": {
-        "x": -3.1163585218510246,
-        "y": 6.6026555311266115,
-        "z": -4.82852819157864
-      },
-      "covariance_trace": 4.3199999999999985,
-      "class_hypothesis": "multirotor",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "acoustic",
-        "radar",
-        "rf"
-      ],
-      "hit_count": 50,
-      "coast_ticks": 0,
-      "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "rf_signature",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-000000000003",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2389.291065041415,
-        "y": -1596.1335702049523,
-        "z": 158.25635634246106
-      },
-      "velocity": {
-        "x": 66.91498635069021,
-        "y": 221.70512521488425,
-        "z": -3.1938680375725537
+        "x": 23.071968803753904,
+        "y": 17.08832369334,
+        "z": 3.6543512514760477
       },
       "covariance_trace": 4.199999999999998,
-      "class_hypothesis": "multirotor",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "acoustic",
-        "radar",
-        "rf"
-      ],
-      "hit_count": 50,
-      "coast_ticks": 0,
-      "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "rf_signature",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-000000000004",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2245.6948305670608,
-        "y": -1681.9932534464808,
-        "z": 192.28129680355616
-      },
-      "velocity": {
-        "x": 203.5819292834796,
-        "y": -6.950854116241265,
-        "z": -0.14641174992321448
-      },
-      "covariance_trace": 4.199999999999998,
-      "class_hypothesis": "multirotor",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "acoustic",
-        "radar",
-        "rf"
-      ],
-      "hit_count": 44,
-      "coast_ticks": 0,
-      "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "rf_signature",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-000000000005",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2383.91168217557,
-        "y": -1681.4922354295172,
-        "z": 211.46810827505826
-      },
-      "velocity": {
-        "x": 10.30298379561171,
-        "y": 18.263371413026153,
-        "z": 3.664997251712949
-      },
-      "covariance_trace": 4.3199999999999985,
-      "class_hypothesis": "swarm_member",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "acoustic",
-        "radar",
-        "rf"
-      ],
-      "hit_count": 41,
-      "coast_ticks": 0,
-      "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "rf_signature",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-000000000006",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2462.4639670035467,
-        "y": -1836.6061936791837,
-        "z": 126.15469752315346
-      },
-      "velocity": {
-        "x": 21.97935163528247,
-        "y": 24.89028796606594,
-        "z": -5.0
-      },
-      "covariance_trace": 6.119999999999997,
-      "class_hypothesis": "multirotor",
-      "class_confidence": 0.55,
-      "affiliation": "hostile",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "radar",
-        "rf"
-      ],
-      "hit_count": 28,
-      "coast_ticks": 0,
-      "age_s": 5.749999999999987,
-      "rf_dark": false,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "rf_signature",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-000000000007",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2319.762235455264,
-        "y": -1662.5728104835366,
-        "z": 198.76532830117958
-      },
-      "velocity": {
-        "x": 25.106325491608068,
-        "y": 15.38030285321475,
-        "z": 2.8750906488810957
-      },
-      "covariance_trace": 4.535999999999998,
       "class_hypothesis": "fiber_optic_uas",
       "class_confidence": 0.7799999999999999,
       "affiliation": "unknown",
@@ -974,7 +804,7 @@
         "acoustic",
         "radar"
       ],
-      "hit_count": 25,
+      "hit_count": 26,
       "coast_ticks": 0,
       "age_s": 5.749999999999987,
       "rf_dark": true,
@@ -986,19 +816,86 @@
       "eta_s": null
     },
     {
-      "id": "3c6ef372-fe94-f800-0000-000000000008",
+      "id": "3c6ef372-fe94-f800-0000-000000000003",
       "t": 5.999999999999987,
       "position": {
-        "x": -2671.987370466342,
-        "y": -1695.255954096099,
-        "z": 123.43038202648083
+        "x": -2560.0324542400817,
+        "y": -1668.9111543510587,
+        "z": 128.8828473894169
       },
       "velocity": {
-        "x": 11.951704945486906,
-        "y": 22.273691990316923,
-        "z": -4.007537600000001
+        "x": 55.42668195555235,
+        "y": 52.20048955362611,
+        "z": -5.0
       },
-      "covariance_trace": 5.629317119999998,
+      "covariance_trace": 5.399999999999998,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 32,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000004",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2385.5318612113515,
+        "y": -1787.7274703431356,
+        "z": 122.16180834398455
+      },
+      "velocity": {
+        "x": 23.33139715014798,
+        "y": 21.77346737602895,
+        "z": -4.752593543595273
+      },
+      "covariance_trace": 4.3199999999999985,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar"
+      ],
+      "hit_count": 36,
+      "coast_ticks": 0,
+      "age_s": 5.749999999999987,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000005",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2705.181814744935,
+        "y": -1683.847141904263,
+        "z": 121.84614057904857
+      },
+      "velocity": {
+        "x": -49.93068879680733,
+        "y": 32.845915113526,
+        "z": -3.5240000000000005
+      },
+      "covariance_trace": 11.265599999999994,
       "class_hypothesis": "multirotor",
       "class_confidence": 0.55,
       "affiliation": "hostile",
@@ -1008,7 +905,41 @@
         "radar",
         "rf"
       ],
-      "hit_count": 20,
+      "hit_count": 30,
+      "coast_ticks": 5,
+      "age_s": 5.749999999999987,
+      "rf_dark": false,
+      "track_status": "coasting",
+      "last_update_t": 5.749999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000007",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2465.6571841476825,
+        "y": -1829.105964539025,
+        "z": 130.24866760747196
+      },
+      "velocity": {
+        "x": 23.196691031535337,
+        "y": 24.725240957976904,
+        "z": -5.0
+      },
+      "covariance_trace": 4.199999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 35,
       "coast_ticks": 0,
       "age_s": 5.749999999999987,
       "rf_dark": false,
@@ -1023,102 +954,106 @@
       "id": "3c6ef372-fe94-f800-0000-000000000009",
       "t": 5.999999999999987,
       "position": {
-        "x": -2464.313261076312,
-        "y": -1654.5140448432294,
-        "z": 137.07825800890876
+        "x": -2814.8761798072687,
+        "y": -1760.9773810181887,
+        "z": 116.91020200745876
       },
       "velocity": {
-        "x": 28.758227238897867,
-        "y": 13.085370511598693,
-        "z": -1.9791747056768
+        "x": -107.18923971226738,
+        "y": -50.97031523832094,
+        "z": -4.551286152978178
       },
-      "covariance_trace": 5.299199999999997,
+      "covariance_trace": 16.810069708799993,
       "class_hypothesis": "swarm_member",
-      "class_confidence": 0.35,
-      "affiliation": "unknown",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
       "threat_score": 0.0,
       "sensor_provenance": [
-        "radar"
+        "acoustic",
+        "radar",
+        "rf"
       ],
-      "hit_count": 17,
-      "coast_ticks": 0,
+      "hit_count": 22,
+      "coast_ticks": 15,
       "age_s": 5.699999999999987,
-      "rf_dark": true,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
+      "rf_dark": false,
+      "track_status": "coasting",
+      "last_update_t": 5.249999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
-      "identity_basis": "unknown",
+      "identity_basis": "rf_signature",
       "eta_s": null
     },
     {
       "id": "3c6ef372-fe94-f800-0000-00000000000a",
       "t": 5.999999999999987,
       "position": {
-        "x": -2341.4499088607636,
-        "y": -1720.3622560627534,
-        "z": 142.00828128690887
+        "x": -2651.1832500226537,
+        "y": -1700.0903332333705,
+        "z": 117.4921288372187
       },
       "velocity": {
-        "x": 23.76223129292988,
-        "y": 17.593012667169244,
-        "z": 1.5875879969450386
-      },
-      "covariance_trace": 7.733951999999995,
-      "class_hypothesis": "fiber_optic_uas",
-      "class_confidence": 0.76,
-      "affiliation": "unknown",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "acoustic",
-        "radar"
-      ],
-      "hit_count": 20,
-      "coast_ticks": 0,
-      "age_s": 5.249999999999987,
-      "rf_dark": true,
-      "track_status": "confirmed",
-      "last_update_t": 5.999999999999987,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "unknown",
-      "eta_s": null
-    },
-    {
-      "id": "3c6ef372-fe94-f800-0000-00000000000b",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2368.253749259318,
-        "y": -1795.6732015987002,
-        "z": 122.28901486720768
-      },
-      "velocity": {
-        "x": 22.032477671522752,
-        "y": 23.329277187412977,
+        "x": 28.34262396677117,
+        "y": 16.339126030522227,
         "z": -5.0
       },
-      "covariance_trace": 10.251924480000016,
-      "class_hypothesis": "fiber_optic_uas",
-      "class_confidence": 0.7799999999999999,
-      "affiliation": "unknown",
+      "covariance_trace": 4.3199999999999985,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
       "threat_score": 0.0,
       "sensor_provenance": [
         "acoustic",
-        "radar"
+        "radar",
+        "rf"
       ],
-      "hit_count": 9,
+      "hit_count": 23,
       "coast_ticks": 0,
-      "age_s": 4.999999999999987,
-      "rf_dark": true,
+      "age_s": 5.399999999999987,
+      "rf_dark": false,
       "track_status": "confirmed",
       "last_update_t": 5.999999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
-      "identity_basis": "unknown",
+      "identity_basis": "rf_signature",
       "eta_s": null
     },
     {
       "id": "3c6ef372-fe94-f800-0000-00000000000c",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2401.222992157204,
+        "y": -1634.598939160364,
+        "z": 135.39902914794715
+      },
+      "velocity": {
+        "x": 51.19666898758105,
+        "y": 5.227926546056855,
+        "z": -5.0
+      },
+      "covariance_trace": 6.999999999999998,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 25,
+      "coast_ticks": 5,
+      "age_s": 4.999999999999987,
+      "rf_dark": true,
+      "track_status": "coasting",
+      "last_update_t": 5.749999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-00000000000d",
       "t": 5.999999999999987,
       "position": {
         "x": -1470.0,
@@ -1150,27 +1085,28 @@
       "eta_s": null
     },
     {
-      "id": "3c6ef372-fe94-f800-0000-00000000000d",
+      "id": "3c6ef372-fe94-f800-0000-00000000000e",
       "t": 5.999999999999987,
       "position": {
-        "x": -2483.667308656072,
-        "y": -1661.0334346319423,
-        "z": 140.955300155058
+        "x": -2295.7977815074096,
+        "y": -1641.9975654163457,
+        "z": 202.93003206466227
       },
       "velocity": {
-        "x": 25.666201857519948,
-        "y": 15.22462697393318,
-        "z": 0.5136800000000008
+        "x": 24.218375153412175,
+        "y": 15.900597019902497,
+        "z": 4.411317832445782
       },
-      "covariance_trace": 10.188099072000016,
-      "class_hypothesis": "swarm_member",
-      "class_confidence": 0.35,
+      "covariance_trace": 5.141198315519997,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.74,
       "affiliation": "unknown",
       "threat_score": 0.0,
       "sensor_provenance": [
+        "acoustic",
         "radar"
       ],
-      "hit_count": 9,
+      "hit_count": 21,
       "coast_ticks": 0,
       "age_s": 4.849999999999986,
       "rf_dark": true,
@@ -1182,59 +1118,28 @@
       "eta_s": null
     },
     {
-      "id": "3c6ef372-fe94-f800-0000-00000000000e",
-      "t": 5.999999999999987,
-      "position": {
-        "x": -2381.3575552563975,
-        "y": -1701.8726530883328,
-        "z": 161.34359160133286
-      },
-      "velocity": {
-        "x": 19.15233466915522,
-        "y": 24.065527151828395,
-        "z": -1.9896800000000008
-      },
-      "covariance_trace": 42.648000000000074,
-      "class_hypothesis": "swarm_member",
-      "class_confidence": 0.35,
-      "affiliation": "unknown",
-      "threat_score": 0.0,
-      "sensor_provenance": [
-        "radar"
-      ],
-      "hit_count": 4,
-      "coast_ticks": 40,
-      "age_s": 4.249999999999986,
-      "rf_dark": true,
-      "track_status": "coasting",
-      "last_update_t": 3.9999999999999867,
-      "nearest_asset_id": null,
-      "zone_state": "outside",
-      "identity_basis": "unknown",
-      "eta_s": null
-    },
-    {
       "id": "3c6ef372-fe94-f800-0000-00000000000f",
       "t": 5.999999999999987,
       "position": {
-        "x": -2541.3862958621403,
-        "y": -1671.4840249474346,
-        "z": 130.74714165959085
+        "x": -2706.127303767877,
+        "y": -1691.8740728069515,
+        "z": 125.17553617549022
       },
       "velocity": {
-        "x": 29.846595501353733,
-        "y": 11.5034491546453,
-        "z": -0.4787823999999992
+        "x": -25.37748549886683,
+        "y": 45.611075621128876,
+        "z": -5.0
       },
-      "covariance_trace": 21.556800000000035,
-      "class_hypothesis": "swarm_member",
-      "class_confidence": 0.35,
-      "affiliation": "unknown",
+      "covariance_trace": 12.472404480000016,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
       "threat_score": 0.0,
       "sensor_provenance": [
-        "radar"
+        "radar",
+        "rf"
       ],
-      "hit_count": 5,
+      "hit_count": 9,
       "coast_ticks": 0,
       "age_s": 4.249999999999986,
       "rf_dark": false,
@@ -1242,35 +1147,138 @@
       "last_update_t": 5.999999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
-      "identity_basis": "unknown",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000010",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2396.0353440454824,
+        "y": -1618.6148388912802,
+        "z": 161.7603802148689
+      },
+      "velocity": {
+        "x": 22.475312244682947,
+        "y": 16.064838399504644,
+        "z": 2.772518048636674
+      },
+      "covariance_trace": 4.435199999999997,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 16,
+      "coast_ticks": 0,
+      "age_s": 4.249999999999986,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000011",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2355.8931125300396,
+        "y": -1775.012966695941,
+        "z": 118.94447388897991
+      },
+      "velocity": {
+        "x": 25.327084313702336,
+        "y": 23.49311562965775,
+        "z": -5.0
+      },
+      "covariance_trace": 4.391999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 21,
+      "coast_ticks": 0,
+      "age_s": 4.249999999999986,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000012",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2250.94616866622,
+        "y": -1710.3806648323764,
+        "z": 204.37852161322297
+      },
+      "velocity": {
+        "x": 72.41230032389275,
+        "y": -71.11102001546652,
+        "z": 5.0
+      },
+      "covariance_trace": 6.407999999999998,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 13,
+      "coast_ticks": 0,
+      "age_s": 3.999999999999986,
+      "rf_dark": true,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
       "eta_s": null
     },
     {
       "id": "3c6ef372-fe94-f800-0000-000000000013",
       "t": 5.999999999999987,
       "position": {
-        "x": -2530.626821971154,
-        "y": -1882.7116636309088,
-        "z": 110.97899915491662
+        "x": -2512.672477479254,
+        "y": -1675.3684208331363,
+        "z": 129.73813008215743
       },
       "velocity": {
-        "x": 22.508305698176756,
-        "y": 27.403222356035073,
+        "x": 32.47772655150043,
+        "y": 9.959249931892282,
         "z": -5.0
       },
-      "covariance_trace": 22.46400000000002,
-      "class_hypothesis": "swarm_member",
-      "class_confidence": 0.35,
+      "covariance_trace": 4.3199999999999985,
+      "class_hypothesis": "fiber_optic_uas",
+      "class_confidence": 0.7799999999999999,
       "affiliation": "unknown",
       "threat_score": 0.0,
       "sensor_provenance": [
+        "acoustic",
         "radar"
       ],
-      "hit_count": 3,
+      "hit_count": 20,
       "coast_ticks": 0,
-      "age_s": 1.699999999999994,
-      "rf_dark": false,
-      "track_status": "tentative",
+      "age_s": 3.999999999999986,
+      "rf_dark": true,
+      "track_status": "confirmed",
       "last_update_t": 5.999999999999987,
       "nearest_asset_id": null,
       "zone_state": "outside",
@@ -1281,9 +1289,108 @@
       "id": "3c6ef372-fe94-f800-0000-000000000015",
       "t": 5.999999999999987,
       "position": {
-        "x": -2502.9770403788452,
-        "y": -1913.723086188406,
-        "z": 112.93051191895925
+        "x": -2557.746000872749,
+        "y": -1719.0581135358589,
+        "z": 116.02960892495794
+      },
+      "velocity": {
+        "x": -26.844480198222836,
+        "y": 157.39141814544632,
+        "z": -5.0
+      },
+      "covariance_trace": 6.0479999999999965,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "acoustic",
+        "radar",
+        "rf"
+      ],
+      "hit_count": 14,
+      "coast_ticks": 0,
+      "age_s": 2.7499999999999902,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000016",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2504.934882604285,
+        "y": -1918.472795283637,
+        "z": 112.92943737892
+      },
+      "velocity": {
+        "x": 16.44146563635536,
+        "y": 17.565308404827647,
+        "z": -5.0
+      },
+      "covariance_trace": 5.399999999999998,
+      "class_hypothesis": "multirotor",
+      "class_confidence": 0.55,
+      "affiliation": "hostile",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar",
+        "rf"
+      ],
+      "hit_count": 10,
+      "coast_ticks": 0,
+      "age_s": 1.699999999999994,
+      "rf_dark": false,
+      "track_status": "confirmed",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "rf_signature",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000017",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2450.8583066332,
+        "y": -1867.7683777049715,
+        "z": 129.4281603694428
+      },
+      "velocity": {
+        "x": 23.265162539545045,
+        "y": 26.87146383588525,
+        "z": -5.0
+      },
+      "covariance_trace": 25.800000000000004,
+      "class_hypothesis": "swarm_member",
+      "class_confidence": 0.35,
+      "affiliation": "unknown",
+      "threat_score": 0.0,
+      "sensor_provenance": [
+        "radar"
+      ],
+      "hit_count": 2,
+      "coast_ticks": 0,
+      "age_s": 0.2499999999999991,
+      "rf_dark": false,
+      "track_status": "tentative",
+      "last_update_t": 5.999999999999987,
+      "nearest_asset_id": null,
+      "zone_state": "outside",
+      "identity_basis": "unknown",
+      "eta_s": null
+    },
+    {
+      "id": "3c6ef372-fe94-f800-0000-000000000019",
+      "t": 5.999999999999987,
+      "position": {
+        "x": -2526.2921172609604,
+        "y": -1888.6130586501854,
+        "z": 115.29679467195506
       },
       "velocity": {
         "x": 24.73142566042852,

@@ -1,6 +1,9 @@
 use aegis_fusion::FusionEngine;
 use aegis_recommend::{AcceptEffect, RecommendEngine};
-use aegis_schema::{AirPicture, ClientCommand, OperatorState, ServerMessage, ZoneKind};
+use aegis_scenario::generate;
+use aegis_schema::{
+    AirPicture, ClientCommand, OperatorState, ScenarioClass, ServerMessage, ZoneKind,
+};
 use aegis_sim::{resolve_scenario_dir, Simulation};
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::State;
@@ -105,7 +108,8 @@ async fn main() -> anyhow::Result<()> {
                     }
                 }
 
-                let recs = recommend.evaluate(t, &mut tracks, sim.zones());
+                let effectors = sim.effector_status();
+                let recs = recommend.evaluate(t, &mut tracks, sim.zones(), &effectors);
                 build_picture(&sim, &recommend, detections, tracks, recs)
             };
 
@@ -158,6 +162,7 @@ fn build_picture(
         speed: sim.speed,
         seed: sim.seed,
         scenario_id: sim.manifest.id.clone(),
+        scenario_class: sim.manifest.scenario_class.map(|c| c.as_str().to_string()),
         detections,
         tracks,
         recommendations,
@@ -184,6 +189,7 @@ async fn get_snapshot(State(state): State<Arc<AppState>>) -> Json<AirPicture> {
         speed: sim.speed,
         seed: sim.seed,
         scenario_id: sim.manifest.id.clone(),
+        scenario_class: sim.manifest.scenario_class.map(|c| c.as_str().to_string()),
         detections: sim.last_detections.clone(),
         tracks: Vec::new(),
         recommendations: Vec::new(),
@@ -252,6 +258,26 @@ async fn apply_command(state: &AppState, cmd: ClientCommand) {
             state.recommend.write().await.reset();
             state.last_track_pos.write().await.clear();
         }
+        ClientCommand::SetScenarioClass { class, seed } => {
+            let Some(parsed) = ScenarioClass::parse(&class) else {
+                warn!("unknown scenario class '{class}'");
+                return;
+            };
+            let seed = seed.unwrap_or(42);
+            match generate(parsed, seed) {
+                Ok(manifest) => {
+                    let mut sim = state.sim.write().await;
+                    *sim = Simulation::from_manifest(manifest, seed);
+                    sim.pause();
+                    drop(sim);
+                    state.fusion.write().await.reset_with_seed(seed);
+                    state.recommend.write().await.reset();
+                    state.last_track_pos.write().await.clear();
+                    info!(class = %parsed.as_str(), seed, "loaded scenario class");
+                }
+                Err(err) => warn!("failed to generate class '{class}': {err}"),
+            }
+        }
         ClientCommand::CueEo { track_id } => state.sim.write().await.cue_eo(track_id),
         ClientCommand::FailSensor { sensor_id } => state.sim.write().await.fail_sensor(&sensor_id),
         ClientCommand::RestoreSensor { sensor_id } => {
@@ -286,14 +312,15 @@ async fn apply_accept_effect(state: &AppState, effect: AcceptEffect) {
                 .annotate_effect_result("EO tasked");
         }
         AcceptEffect::AlertSector => {
+            let mut sim = state.sim.write().await;
+            sim.apply_alert_sector();
             let mut recommend = state.recommend.write().await;
-            let sim = state.sim.read().await;
             for z in sim.zones() {
                 if matches!(z.kind, ZoneKind::KeepOut | ZoneKind::NoFly) {
                     recommend.mark_zone_alerted(z.id.clone());
                 }
             }
-            recommend.annotate_effect_result("keep-out / no-fly alerted");
+            recommend.annotate_effect_result("keep-out / no-fly alerted — sensor attention up");
         }
         AcceptEffect::ActivateJammer { track_id } => {
             let track_pos = {
@@ -310,11 +337,12 @@ async fn apply_accept_effect(state: &AppState, effect: AcceptEffect) {
             state.recommend.write().await.annotate_effect_result(note);
         }
         AcceptEffect::EvacuatePad => {
+            state.sim.write().await.apply_evacuate_pad();
             state
                 .recommend
                 .write()
                 .await
-                .annotate_effect_result("pad evacuated");
+                .annotate_effect_result("pad evacuated — friendlies clearing");
         }
         AcceptEffect::HandOff { track_id: _ } => {
             state
