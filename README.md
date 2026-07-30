@@ -2,25 +2,27 @@
 
 [![CI](https://github.com/dubare0898/Aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/dubare0898/Aegis/actions/workflows/ci.yml)
 
-**Aegis** is a simulation-first counter-UAS (C-UAS) **decision-support** platform: layered sensors feed deterministic fusion and doctrine-aware recommendations that **prioritize threats by impact and trajectory (time-to-arrival)** so scarce jammer/kinetic capacity is conserved for the right tracks—then an operator authorizes soft or mission-critical effects in the loop.
+**Aegis** is a simulation-first counter-UAS (C-UAS) **decision-support** platform: layered sensors feed deterministic fusion and doctrine-aware recommendations that **prioritize threats by impact and trajectory (time-to-arrival)** so scarce jammer/kinetic capacity is conserved for the right tracks—then the console authorizes soft or mission-critical effects (**Operator Y/N** by default, or optional **Auto engage** in sim).
 
 ## What this is / what this is not
 
 | This is | This is not |
 |---------|-------------|
 | A **simulation** and engineering testbed for detect → track → recommend → authorize | A real-world weapons-control or fire-control system |
-| Operator-in-the-loop decision support with explainable recommendations | Autonomous lethal engagement |
+| Operator-in-the-loop decision support with explainable recommendations | A real autonomous lethal / weapons-release system |
+| Optional **Auto engage** sim mode (no Y/N modal) for soak and stress runs | Authority to control physical effectors or real fire-control |
 | Deterministic scenario generation, golden demos, batch/soak harnesses | A deployment-ready defense product |
 
-**Jammer dwell and kinetic engagements in this repo are simulated only.** They exist to train and evaluate the decision loop, not to control physical effectors.
+**Jammer dwell and kinetic engagements in this repo are simulated only.** They exist to train and evaluate the decision loop, not to control physical effectors. **Auto engage** is a console sim convenience—still not real autonomous weapons.
 
 ## Key capabilities
 
 - Multi-sensor simulation (radar, RF, EO/IR, ADS-B, acoustic) over a military FOB site pack
 - Deterministic fusion + threat scoring + recommendation engine (impact/ETA ranking to conserve jammer & kinetic; fiber ≠ jammer-first; friendlies never mission-critical)
-- Operator console: air picture, ETA + rank rationale on tracks/recs, engage confirmation, enemies-downed log
-- Seeded scenario **classes** (raid mixes, clutter, faults, friendly crossing)
+- Operator console: air picture with shape-aware legend glyphs, position lerp, ETA + rank rationale, batch **Engage high-level threats? Y/N**, HUD **Operator (Y/N)** / **Auto engage**, **Reset 42** + **Random seed**, enemies-downed log
+- Seeded scenario **classes** (raid mixes, clutter, faults, friendly crossing) via harness / `aegis_scenario` (API loads the site pack; no interactive class picker over WS yet)
 - Demo harness: golden replay, smoke suite, seed-batch metrics, long-run soak invariants
+- `./scripts/check.sh` — workspace tests + smoke + `--assert-golden`
 
 ## Architecture
 
@@ -69,18 +71,26 @@ CARGO_TARGET_DIR="$PWD/target" cargo test --workspace
 CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --suite smoke
 CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --assert-golden
 
-# Desktop (builds release API + console dist as needed)
+# Desktop (rebuilds console dist when src is newer; serves static dist)
 ./scripts/launch-desktop.sh
 ```
 
-Two-terminal console (optional):
+Two-terminal console (optional — preferred for UI iteration):
 
 ```bash
 CARGO_TARGET_DIR="$PWD/target" cargo run -p aegis_api
 cd apps/console && npm install && npm run dev
 ```
 
+Desktop/`prepare-desktop-resources.sh` serve the built `apps/console/dist`. After console UI changes, either re-run `./scripts/launch-desktop.sh` (auto-rebuilds when `src` is newer than `dist`) or `cd apps/console && npm run build`. Use `npm run dev` for hot-reload while iterating on the operator UI.
+
 Prefer `CARGO_TARGET_DIR="$PWD/target"` so builds stay inside the repo.
+
+Quick validation bar (tests + smoke + golden):
+
+```bash
+./scripts/check.sh
+```
 
 ## Optional Docker (headless reproducibility)
 
@@ -144,6 +154,8 @@ The hand-authored `scenarios/military-base-swarm` pack + seed **42** remains the
 
 ## Roadmap (near-term)
 
+- Durable KPI / run logging (JSONL + SQLite) for demo and soak runs
+- Interactive scenario class picker over the API/WebSocket (harness already exercises classes)
 - Stronger batch reporting / CI class sample
 - Live-sensor adapter spike (read-only) behind a feature flag
 

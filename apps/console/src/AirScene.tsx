@@ -113,9 +113,31 @@ export function AirScene({
     const ro = new ResizeObserver(onResize)
     ro.observe(mount)
 
+    const LERP = 0.14
     let frame = 0
     const animate = () => {
       frame = requestAnimationFrame(animate)
+      const st = stateRef.current
+      if (st) {
+        for (const mesh of st.trackMeshes.values()) {
+          const tx = mesh.userData.targetX as number | undefined
+          const ty = mesh.userData.targetY as number | undefined
+          const tz = mesh.userData.targetZ as number | undefined
+          if (tx == null || ty == null || tz == null) continue
+          mesh.position.x += (tx - mesh.position.x) * LERP
+          mesh.position.y += (ty - mesh.position.y) * LERP
+          mesh.position.z += (tz - mesh.position.z) * LERP
+        }
+        for (const mesh of st.truthMeshes.values()) {
+          const tx = mesh.userData.targetX as number | undefined
+          const ty = mesh.userData.targetY as number | undefined
+          const tz = mesh.userData.targetZ as number | undefined
+          if (tx == null || ty == null || tz == null) continue
+          mesh.position.x += (tx - mesh.position.x) * LERP
+          mesh.position.y += (ty - mesh.position.y) * LERP
+          mesh.position.z += (tz - mesh.position.z) * LERP
+        }
+      }
       controls.update()
       renderer.render(scene, camera)
     }
@@ -274,6 +296,7 @@ export function AirScene({
     for (const tr of picture.tracks) {
       seen.add(tr.id)
       let mesh = st.trackMeshes.get(tr.id)
+      const isNew = !mesh
       if (!mesh) {
         // Spheres = fused tracks only.
         mesh = new THREE.Mesh(
@@ -281,10 +304,17 @@ export function AirScene({
           new THREE.MeshStandardMaterial({ color: 0xff5c5c }),
         )
         mesh.userData.trackId = tr.id
+        mesh.position.set(tr.position.x, tr.position.y, tr.position.z)
         st.trackGroup.add(mesh)
         st.trackMeshes.set(tr.id, mesh)
       }
-      mesh.position.set(tr.position.x, tr.position.y, tr.position.z)
+      // Lerp toward fused position each animation frame (set target, don't snap).
+      mesh.userData.targetX = tr.position.x
+      mesh.userData.targetY = tr.position.y
+      mesh.userData.targetZ = tr.position.z
+      if (isNew) {
+        mesh.position.set(tr.position.x, tr.position.y, tr.position.z)
+      }
       const mat = mesh.material as THREE.MeshStandardMaterial
       mat.color.set(colorForTrack(tr, selectedId))
       if (tr.id === selectedId) {
@@ -316,6 +346,7 @@ export function AirScene({
         if (ent.role === 'friendly') continue
         truthSeen.add(ent.id)
         let mesh = st.truthMeshes.get(ent.id)
+        const isNew = !mesh
         if (!mesh) {
           // Magenta wireframe — debug-only; never solid like effectors.
           mesh = new THREE.Mesh(
@@ -328,6 +359,7 @@ export function AirScene({
               depthWrite: false,
             }),
           )
+          mesh.position.set(ent.position.x, ent.position.y, ent.position.z)
           st.truthGroup.add(mesh)
           st.truthMeshes.set(ent.id, mesh)
         }
@@ -336,7 +368,12 @@ export function AirScene({
           ent.neutralized ? 0x554455 : ent.jammed ? 0xcc66aa : 0xe040a0,
         )
         mat.opacity = ent.neutralized ? 0.22 : 0.5
-        mesh.position.set(ent.position.x, ent.position.y, ent.position.z)
+        mesh.userData.targetX = ent.position.x
+        mesh.userData.targetY = ent.position.y
+        mesh.userData.targetZ = ent.position.z
+        if (isNew) {
+          mesh.position.set(ent.position.x, ent.position.y, ent.position.z)
+        }
       }
     }
     for (const [id, mesh] of st.truthMeshes) {

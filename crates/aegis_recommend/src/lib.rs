@@ -4,18 +4,37 @@ use aegis_schema::{
     RecommendedAction, RecommendedBy, SensorKind, Track, TrackClass, Vec3, Zone, ZoneKind,
     ZoneState,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 const REJECT_COOLDOWN_S: f64 = 30.0;
 const DEFER_COOLDOWN_S: f64 = 10.0;
 const MAX_EVENTS: usize = 40;
 /// Soft-first: when ETA exceeds this, prefer cue/alert over jammer/kinetic (unless imminent).
-const ETA_SOFT_FIRST_S: f64 = 45.0;
-/// Cap concurrent open jammer/kinetic recommendations — conserve scarce effectors.
-const MAX_OPEN_MISSION_CRITICAL: usize = 1;
-/// Closing-speed floor (m/s) to treat a track as inbound for ETA.
+/// Lowered so inbound high-score tracks open jammer/kinetic earlier on multi-ship raids.
+const ETA_SOFT_FIRST_S: f64 = 32.0;
+/// Soft-first only beyond this range — mid-range inbound skips soft hold.
+const SOFT_FIRST_MIN_DIST_M: f64 = 1100.0;
+/// Cap concurrent open jammer/kinetic recommendations — match typical FOB effector
+/// count (2 jammer + 3 kinetic) so swarm ingress can be packaged for OITL batch auth
+/// without free-firing every soft track.
+const MAX_OPEN_MISSION_CRITICAL: usize = 5;
+/// Closing-speed floor (m/s) used in rationale labels / evidence.
 const CLOSING_EPS_MPS: f64 = 1.0;
+/// EMA alpha for per-track closing speed (smooths ETA / inbound flips).
+const CLOSING_EMA_ALPHA: f64 = 0.22;
+/// Hysteresis: must exceed this smoothed closing to latch inbound.
+const CLOSING_INBOUND_MPS: f64 = 2.0;
+/// Hysteresis: must fall below this smoothed closing to latch outbound.
+const CLOSING_OUTBOUND_MPS: f64 = 0.4;
+/// Rank order only changes when threat score delta exceeds this (reduces thrash).
+const RANK_SCORE_HYSTERESIS: f64 = 3.5;
+
+#[derive(Debug, Clone)]
+struct TrackKinematics {
+    closing_ema: f64,
+    inbound: bool,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct ActionKey {
@@ -50,6 +69,10 @@ pub struct RecommendEngine {
     state: OperatorState,
     issued: usize,
     first_recommend_t: Option<f64>,
+    /// Smoothed closing / inbound latch per track.
+    kinematics: HashMap<Uuid, TrackKinematics>,
+    /// Sticky threat scores for rank hysteresis (avoids thrash on small deltas).
+    sticky_scores: HashMap<Uuid, f64>,
 }
 
 impl RecommendEngine {
@@ -66,6 +89,8 @@ impl RecommendEngine {
         self.state = OperatorState::default();
         self.issued = 0;
         self.first_recommend_t = None;
+        self.kinematics.clear();
+        self.sticky_scores.clear();
     }
 
     pub fn issued_count(&self) -> usize {
@@ -228,6 +253,32 @@ impl RecommendEngine {
             .unwrap_or(false)
     }
 
+    /// EMA closing speed + inbound/outbound hysteresis (reduces ETA flicker).
+    fn update_kinematics(&mut self, track_id: Uuid, raw_closing: f64) -> (f64, bool) {
+        if let Some(entry) = self.kinematics.get_mut(&track_id) {
+            entry.closing_ema =
+                (1.0 - CLOSING_EMA_ALPHA) * entry.closing_ema + CLOSING_EMA_ALPHA * raw_closing;
+            if entry.inbound {
+                if entry.closing_ema < CLOSING_OUTBOUND_MPS {
+                    entry.inbound = false;
+                }
+            } else if entry.closing_ema > CLOSING_INBOUND_MPS {
+                entry.inbound = true;
+            }
+            (entry.closing_ema, entry.inbound)
+        } else {
+            let inbound = raw_closing > CLOSING_INBOUND_MPS;
+            self.kinematics.insert(
+                track_id,
+                TrackKinematics {
+                    closing_ema: raw_closing,
+                    inbound,
+                },
+            );
+            (raw_closing, inbound)
+        }
+    }
+
     pub fn evaluate(
         &mut self,
         t: f64,
@@ -253,6 +304,7 @@ impl RecommendEngine {
             .map(|tr| tr.position)
             .collect();
 
+        let mut live_ids: HashSet<Uuid> = HashSet::new();
         for tr in tracks.iter_mut() {
             if tr.affiliation == Affiliation::Friendly {
                 tr.threat_score = 0.0;
@@ -260,10 +312,16 @@ impl RecommendEngine {
                 continue;
             }
 
+            live_ids.insert(tr.id);
             let dist = tr.position.distance(&asset);
             let speed = tr.velocity.magnitude_xy();
-            let closing = closing_speed(&tr.position, &tr.velocity, &asset);
-            tr.eta_s = eta_seconds(dist, closing);
+            let raw_closing = closing_speed(&tr.position, &tr.velocity, &asset);
+            let (closing, inbound) = self.update_kinematics(tr.id, raw_closing);
+            tr.eta_s = if inbound {
+                eta_seconds(dist, closing.max(CLOSING_EPS_MPS))
+            } else {
+                None
+            };
             let zone_breach = keep_out
                 .map(|z| tr.position.distance_xy(&z.center) < z.radius_m)
                 .unwrap_or(false);
@@ -304,15 +362,32 @@ impl RecommendEngine {
             }
             tr.threat_score = score.clamp(0.0, 100.0);
         }
+        self.kinematics.retain(|id, _| live_ids.contains(id));
+        self.sticky_scores.retain(|id, _| live_ids.contains(id));
+
+        // Sticky scores: only update ranking score when delta exceeds threshold (total order).
+        for tr in tracks.iter() {
+            if tr.affiliation == Affiliation::Friendly || tr.threat_score < 20.0 {
+                continue;
+            }
+            let sticky = match self.sticky_scores.get(&tr.id) {
+                Some(&prev) if (tr.threat_score - prev).abs() < RANK_SCORE_HYSTERESIS => prev,
+                _ => tr.threat_score,
+            };
+            self.sticky_scores.insert(tr.id, sticky);
+        }
 
         let mut ranked: Vec<&Track> = tracks
             .iter()
             .filter(|tr| tr.affiliation != Affiliation::Friendly && tr.threat_score >= 20.0)
             .collect();
+        let sticky = &self.sticky_scores;
         ranked.sort_by(|a, b| {
-            b.threat_score
-                .partial_cmp(&a.threat_score)
+            let sa = sticky.get(&a.id).copied().unwrap_or(a.threat_score);
+            let sb = sticky.get(&b.id).copied().unwrap_or(b.threat_score);
+            sb.partial_cmp(&sa)
                 .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| a.id.cmp(&b.id))
         });
 
         let mut recs = Vec::new();
@@ -323,7 +398,11 @@ impl RecommendEngine {
                 continue;
             }
 
-            let closing = closing_speed(&tr.position, &tr.velocity, &asset);
+            let closing = self
+                .kinematics
+                .get(&tr.id)
+                .map(|k| k.closing_ema)
+                .unwrap_or_else(|| closing_speed(&tr.position, &tr.velocity, &asset));
             let (mut action, mut title, mut rationale, confidence, uncertainty) =
                 decide_action(tr, &asset, keep_out);
 
@@ -632,7 +711,7 @@ fn decide_action(
         .sensor_provenance
         .iter()
         .any(|k| matches!(k, SensorKind::Radar));
-    let soft_first = eta_comfortable(tr) && dist >= 700.0;
+    let soft_first = eta_comfortable(tr) && dist >= SOFT_FIRST_MIN_DIST_M;
 
     let mut rationale = Vec::new();
     rationale.push(format!(
@@ -684,7 +763,7 @@ fn decide_action(
                 uncertainty,
             );
         }
-        if !soft_first && dist < 1600.0 && tr.threat_score > 55.0 && has_radar && has_eo {
+        if !soft_first && dist < 2200.0 && tr.threat_score > 48.0 && has_radar && has_eo {
             rationale.push("Corroborated RF-dark threat — kinetic engage authorized path".into());
             return (
                 RecommendedAction::EngageKinetic,
@@ -721,9 +800,9 @@ fn decide_action(
         );
     }
 
-    // RF hostiles: jammer when deep in keep-out; kinetic when high threat + multi-sensor.
+    // RF hostiles: jammer when in keep-out / closing; kinetic when high threat + multi-sensor.
     // Soft-first when ETA is comfortable — conserve scarce effectors.
-    if !soft_first && zone_breach && dist < 900.0 {
+    if !soft_first && zone_breach && dist < 1600.0 {
         return (
             RecommendedAction::RequestJammerAuthorization,
             format!("Authorize soft-kill window on {}", short_id(tr.id)),
@@ -733,8 +812,8 @@ fn decide_action(
         );
     }
     if !soft_first
-        && dist < 1200.0
-        && tr.threat_score > 65.0
+        && dist < 2000.0
+        && tr.threat_score > 52.0
         && has_radar
         && (has_eo || multi >= 2)
         && tr.class_confidence >= 0.5
@@ -1037,13 +1116,14 @@ mod tests {
         let mut eng = RecommendEngine::new();
         let mut tracks = vec![sample_track(Uuid::new_v4(), false)];
         // Far inbound with slow closing → ETA >> soft-first threshold.
-        tracks[0].position = Vec3::new(2800.0, 0.0, 100.0);
-        tracks[0].velocity = Vec3::new(-25.0, 0.0, 0.0);
+        tracks[0].position = Vec3::new(3200.0, 0.0, 100.0);
+        tracks[0].velocity = Vec3::new(-22.0, 0.0, 0.0);
         tracks[0].class_confidence = 0.8;
         tracks[0].sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
         let recs = eng.evaluate(10.0, &mut tracks, &zones());
         assert!(!recs.is_empty());
         assert!(tracks[0].eta_s.unwrap() > ETA_SOFT_FIRST_S);
+        assert!(tracks[0].position.distance(&Vec3::zero()) >= SOFT_FIRST_MIN_DIST_M);
         assert!(
             !is_mission_critical(recs[0].action),
             "comfortable ETA should soft-first, got {:?}",
@@ -1055,6 +1135,29 @@ mod tests {
                 .iter()
                 .any(|r| r.contains("soft-first") || r.contains("conserve")),
             "expected conserve/soft-first rationale"
+        );
+    }
+
+    #[test]
+    fn opens_mission_critical_earlier_on_inbound() {
+        let mut eng = RecommendEngine::new();
+        let mut tracks = vec![sample_track(Uuid::new_v4(), false)];
+        // Mid-range inbound past soft-first ETA — should open jammer/kinetic.
+        tracks[0].position = Vec3::new(1100.0, 0.0, 80.0);
+        tracks[0].velocity = Vec3::new(-42.0, 0.0, 0.0);
+        tracks[0].class_confidence = 0.8;
+        tracks[0].sensor_provenance = vec![SensorKind::Radar, SensorKind::EoIr, SensorKind::Rf];
+        let recs = eng.evaluate(10.0, &mut tracks, &zones());
+        assert!(!recs.is_empty());
+        let eta = tracks[0].eta_s.expect("inbound eta");
+        assert!(
+            eta <= ETA_SOFT_FIRST_S,
+            "expected ETA inside soft-first window, got {eta}"
+        );
+        assert!(
+            recs.iter().any(|r| is_mission_critical(r.action)),
+            "inbound high-score mid-range should open MC, got {:?}",
+            recs[0].action
         );
     }
 

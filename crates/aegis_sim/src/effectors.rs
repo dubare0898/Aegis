@@ -165,8 +165,9 @@ impl EffectorSuite {
             let label = h.label.clone();
             let tid = h.id;
             h.jammed = true;
-            h.c2_degrade = 0.55 * power.clamp(0.4, 1.5);
-            let note = format!("Jammer {jammer_id} active on {label} — C2/RF degraded");
+            // Strong soft-kill: deep C2 degrade drives speed cut + divert in swarm update.
+            h.c2_degrade = (0.88 * power.clamp(0.4, 1.5)).clamp(0.55, 1.35);
+            let note = format!("Jammer {jammer_id} active on {label} — C2/RF degraded; diverting");
             (note.clone(), Some((tid, label, note)))
         };
         self.units[idx].last_result = Some(note.clone());
@@ -263,8 +264,9 @@ impl EffectorSuite {
                         if let Some(tid) = u.tasked_truth_id.take() {
                             if let Some(h) = hostiles.iter_mut().find(|h| h.id == tid) {
                                 if !h.rf_dark {
+                                    // Residual degrade — do not snap back to full ingress speed.
                                     h.jammed = false;
-                                    h.c2_degrade = 0.0;
+                                    h.c2_degrade = (h.c2_degrade * 0.45).max(0.2);
                                 }
                             }
                         }
@@ -273,7 +275,8 @@ impl EffectorSuite {
                         if let Some(h) = hostiles.iter_mut().find(|h| h.id == tid) {
                             if !h.rf_dark && !h.neutralized {
                                 h.jammed = true;
-                                h.c2_degrade = 0.55 * u.config.power.clamp(0.4, 1.5);
+                                h.c2_degrade =
+                                    (0.88 * u.config.power.clamp(0.4, 1.5)).clamp(0.55, 1.35);
                             }
                         }
                     }

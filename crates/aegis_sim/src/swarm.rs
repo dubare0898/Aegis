@@ -4,18 +4,20 @@ use rand_chacha::ChaCha8Rng;
 use uuid::Uuid;
 
 // Steering tunables (module constants — no scenario schema change).
-const SEPARATION_RADIUS_M: f64 = 95.0;
+const SEPARATION_RADIUS_M: f64 = 110.0;
 const ALIGNMENT_RADIUS_M: f64 = 220.0;
 const COHESION_RADIUS_M: f64 = 320.0;
-const MAX_ACCEL_MPS2: f64 = 14.0;
-const MAX_TURN_RATE_RAD_S: f64 = 0.85;
-const WANDER_UPDATE_S: f64 = 2.4;
-const WANDER_STRENGTH: f64 = 4.5;
+const MAX_ACCEL_MPS2: f64 = 12.0;
+const MAX_TURN_RATE_RAD_S: f64 = 0.48;
+const WANDER_UPDATE_S: f64 = 3.8;
+const WANDER_STRENGTH: f64 = 1.8;
 const TERMINAL_ATTACK_RADIUS_M: f64 = 900.0;
 const HYSTERESIS_MARGIN_M: f64 = 80.0;
-const LATERAL_DAMP: f64 = 0.92;
+const LATERAL_DAMP: f64 = 0.93;
 const AVOID_ENTER_FRAC: f64 = 0.55;
 const AVOID_EXIT_FRAC: f64 = 0.72;
+/// Residual C2 degrade recovery rate (per second) after jammer dwell ends.
+const C2_RECOVERY_PER_S: f64 = 0.04;
 
 #[derive(Debug, Clone)]
 pub struct SwarmMember {
@@ -161,31 +163,58 @@ impl SwarmRuntime {
 
             // Deterministic wander refresh (no RNG in update).
             if t >= m.wander_next_t {
-                let step = 0.55
-                    + 0.35 * (m.split_phase + m.wander_theta + t * 0.17).sin()
-                    + if m.role == "decoy" { 0.45 } else { 0.0 };
+                let step = 0.35
+                    + 0.22 * (m.split_phase + m.wander_theta + t * 0.11).sin()
+                    + if m.role == "decoy" { 0.35 } else { 0.0 };
                 m.wander_theta = wrap_pi(m.wander_theta + step);
                 m.wander_next_t =
-                    t + WANDER_UPDATE_S * (0.85 + 0.3 * (m.split_phase * 0.7).cos().abs());
+                    t + WANDER_UPDATE_S * (0.9 + 0.25 * (m.split_phase * 0.7).cos().abs());
             }
-            m.split_phase += dt * 0.12;
+            m.split_phase += dt * 0.08;
+
+            // Residual C2 degrade slowly recovers when not actively jammed.
+            if !m.jammed && m.c2_degrade > 0.0 {
+                m.c2_degrade = (m.c2_degrade - C2_RECOVERY_PER_S * dt).max(0.0);
+            }
 
             let weights = role_weights(m);
-            let aim = if m.role == "decoy" { m.target } else { asset };
+            // While jammed (or strong residual), divert away from the defended asset —
+            // not just a temporary flag that clears and resumes ingress.
+            let divert = m.jammed || m.c2_degrade > 0.35;
+            let aim = if m.role == "decoy" {
+                m.target
+            } else if divert {
+                // Point opposite the asset so divert steering has a clear away vector.
+                Vec3::new(
+                    m.position.x * 2.0 - asset.x,
+                    m.position.y * 2.0 - asset.y,
+                    m.position.z,
+                )
+            } else {
+                asset
+            };
             let to_aim = Vec3::new(
                 aim.x - m.position.x,
                 aim.y - m.position.y,
                 aim.z - m.position.z,
             );
-            let dist_xy = to_aim.magnitude_xy().max(1.0);
-            let terminal = dist_xy < TERMINAL_ATTACK_RADIUS_M;
-            let seek_w = if terminal {
+            let dist_to_asset = m.position.distance_xy(&asset).max(1.0);
+            let terminal = !divert && dist_to_asset < TERMINAL_ATTACK_RADIUS_M;
+            let seek_w = if divert {
+                weights.seek * (0.85 + m.c2_degrade.min(1.0) * 0.45)
+            } else if terminal {
                 weights.seek * 1.55
             } else {
                 weights.seek
             };
 
             let mut desired = scale_xy(&unit_xy(&to_aim), m.max_speed_mps * seek_w);
+            if divert {
+                // Explicit push away from asset (jammer stop-power).
+                let away = Vec3::new(m.position.x - asset.x, m.position.y - asset.y, 0.0);
+                let divert_s = m.max_speed_mps * (0.55 + m.c2_degrade.min(1.2) * 0.65);
+                desired = add_xy(&desired, &scale_xy(&unit_xy(&away), divert_s));
+            }
 
             // Separation / alignment / cohesion from neighbors.
             let mut sep = Vec3::zero();
@@ -219,9 +248,19 @@ impl SwarmRuntime {
             }
 
             if sep_n > 0.0 {
+                // Soften separation when packing toward asset — reduces weave/jitter.
+                let pack = if divert {
+                    0.35
+                } else if terminal {
+                    0.18
+                } else if dist_to_asset < TERMINAL_ATTACK_RADIUS_M * 1.6 {
+                    0.4
+                } else {
+                    0.75
+                };
                 desired = add_xy(
                     &desired,
-                    &scale_xy(&unit_xy(&sep), m.max_speed_mps * weights.separation),
+                    &scale_xy(&unit_xy(&sep), m.max_speed_mps * weights.separation * pack),
                 );
             }
             if align_n > 0.0 {
@@ -257,21 +296,21 @@ impl SwarmRuntime {
                 }
             }
 
-            // Slow wander bias — decoys noisier; fiber quieter / more direct.
+            // Slow wander bias — decoys noisier; fiber/strike quieter / more direct.
             let wander_s = WANDER_STRENGTH
                 * weights.wander
-                * if m.jammed {
-                    // Mild, low-frequency effect — no high-rate weave snaps.
-                    1.0 + m.c2_degrade * 0.35
+                * if divert {
+                    // Low-frequency only — divert is directional, not weave.
+                    0.55
                 } else {
                     1.0
                 };
             desired.x += wander_s * m.wander_theta.cos();
             desired.y += wander_s * m.wander_theta.sin();
 
-            // Jam: reduce max speed, not heading jitter.
-            let speed_scale = if m.jammed {
-                (1.0 - m.c2_degrade * 0.65).clamp(0.25, 1.0)
+            // Jam / residual: deep speed cut so RF hostiles do not resume full ingress.
+            let speed_scale = if m.c2_degrade > 0.0 {
+                (1.0 - m.c2_degrade * 0.82).clamp(0.12, 1.0)
             } else {
                 1.0
             };
@@ -279,12 +318,17 @@ impl SwarmRuntime {
             desired = clamp_speed_xy(&desired, max_speed);
 
             // Vertical: gentle climb/descend toward aim altitude.
-            let desired_vz = ((aim.z - m.position.z) * 0.35).clamp(-6.0, 6.0);
+            let alt_target = if divert {
+                (m.position.z + 20.0).min(280.0)
+            } else {
+                aim.z
+            };
+            let desired_vz = ((alt_target - m.position.z) * 0.28).clamp(-5.0, 5.0);
 
             // Accel toward desired with turn-rate limit on heading.
             let mut new_v = steer_toward(&m.velocity, &desired, desired_vz, dt, max_speed);
 
-            // Damp lateral oscillation relative to seek direction.
+            // Damp lateral oscillation relative to seek / divert direction.
             let seek_u = unit_xy(&to_aim);
             let along = new_v.x * seek_u.x + new_v.y * seek_u.y;
             let lat_x = new_v.x - along * seek_u.x;
@@ -313,29 +357,30 @@ struct RoleWeights {
 
 fn role_weights(m: &SwarmMember) -> RoleWeights {
     if m.role == "decoy" {
+        // Decoys stay relatively noisier than strike/fiber.
         RoleWeights {
             seek: 0.55,
-            separation: 0.9,
+            separation: 0.7,
             alignment: 0.35,
             cohesion: 0.25,
-            wander: 1.6,
+            wander: 1.35,
         }
     } else if m.rf_dark || m.role == "fiber_optic" {
         RoleWeights {
-            seek: 1.15,
-            separation: 0.85,
-            alignment: 0.55,
-            cohesion: 0.4,
-            wander: 0.45,
+            seek: 1.2,
+            separation: 0.32,
+            alignment: 0.65,
+            cohesion: 0.5,
+            wander: 0.12,
         }
     } else {
         // strike / swarm member — coordinated ingress
         RoleWeights {
-            seek: 0.95,
-            separation: 1.0,
-            alignment: 0.85,
-            cohesion: 0.7,
-            wander: 0.75,
+            seek: 1.0,
+            separation: 0.38,
+            alignment: 0.95,
+            cohesion: 0.8,
+            wander: 0.18,
         }
     }
 }

@@ -14,8 +14,15 @@ fi
 
 cd "$ROOT"
 
+# Rebuild console dist when missing or stale vs apps/console/src (desktop serves dist, not Vite).
+need_console_build=0
 if [[ ! -d apps/console/dist ]] || [[ ! -f apps/console/dist/index.html ]]; then
-  echo "[desktop] building console…"
+  need_console_build=1
+elif [[ -n "$(find apps/console/src apps/console/index.html apps/console/vite.config.* apps/console/package.json -newer apps/console/dist/index.html 2>/dev/null | head -1)" ]]; then
+  need_console_build=1
+fi
+if [[ "$need_console_build" -eq 1 ]]; then
+  echo "[desktop] building console (missing or src newer than dist)…"
   (cd apps/console && npm run build)
 fi
 

@@ -104,13 +104,17 @@ impl FusionEngine {
             tr.x += alpha * innov_x;
             tr.y += alpha * innov_y;
             tr.z += alpha * innov_z;
+            // EMA blend — avoid hard-assigning latest detection velocity (smooths ETA/closing).
             if let Some(v) = d.velocity {
-                tr.vx = 0.7 * tr.vx + 0.3 * v.x;
-                tr.vy = 0.7 * tr.vy + 0.3 * v.y;
-                tr.vz = 0.7 * tr.vz + 0.3 * v.z;
+                const V_ALPHA: f64 = 0.18;
+                tr.vx = (1.0 - V_ALPHA) * tr.vx + V_ALPHA * v.x;
+                tr.vy = (1.0 - V_ALPHA) * tr.vy + V_ALPHA * v.y;
+                tr.vz = (1.0 - V_ALPHA) * tr.vz + V_ALPHA * v.z;
             } else {
-                tr.vx = 0.85 * tr.vx + 0.15 * (innov_x / dt.max(1e-3));
-                tr.vy = 0.85 * tr.vy + 0.15 * (innov_y / dt.max(1e-3));
+                const I_ALPHA: f64 = 0.10;
+                let inv_dt = 1.0 / dt.max(1e-3);
+                tr.vx = (1.0 - I_ALPHA) * tr.vx + I_ALPHA * innov_x * inv_dt;
+                tr.vy = (1.0 - I_ALPHA) * tr.vy + I_ALPHA * innov_y * inv_dt;
             }
             tr.p = (tr.p * 0.6).max(4.0);
             tr.coast_ticks = 0;

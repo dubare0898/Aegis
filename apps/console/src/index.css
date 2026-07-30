@@ -317,7 +317,7 @@ button.primary:hover {
 }
 
 .engage-modal {
-  width: min(440px, 100%);
+  width: min(480px, 100%);
   border: 1px solid var(--danger);
   border-left: 4px solid var(--danger);
   background: #1a1212;
@@ -358,6 +358,23 @@ button.primary:hover {
   font-size: 0.7rem;
   color: var(--ink);
   line-height: 1.4;
+}
+
+.engage-package-list {
+  margin: 0.65rem 0 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.68rem;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.engage-package-list li {
+  margin-bottom: 0.2rem;
+}
+
+.engage-package-list strong {
+  color: var(--warn);
+  font-weight: 600;
 }
 
 .engage-actions {
@@ -406,24 +423,108 @@ button.danger-btn:hover {
 
 .legend {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.55rem 0.85rem;
   flex-wrap: wrap;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   color: var(--muted);
+  max-width: 52rem;
 }
 
-.dot {
+.legend-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+}
+
+.legend-label {
+  color: var(--ink);
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.55rem;
+  margin-right: 0.1rem;
+}
+
+/* Shape-aware glyphs — match AirScene.tsx geometry + hex colors */
+.glyph {
   width: 0.55rem;
   height: 0.55rem;
-  border-radius: 50%;
   display: inline-block;
-  margin-right: 0.3rem;
+  margin-right: 0.28rem;
+  vertical-align: -0.05rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-.dot.hostile { background: var(--danger); }
-.dot.friendly { background: var(--friendly); }
-.dot.effector { background: #b8892e; border-radius: 2px; }
-.dot.asset { background: #d4b896; border-radius: 2px; }
+/* Zones = rings (RingGeometry) */
+.glyph.ring {
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid currentColor;
+}
+.glyph.ring.zone-critical { color: #e8a0a0; border-color: #e8a0a0; }
+.glyph.ring.zone-keepout { color: #ffb347; border-color: #ffb347; }
+.glyph.ring.zone-surv { color: #4ecbff; border-color: #4ecbff; }
+
+/* Defended asset = hex cylinder (CylinderGeometry … 6) */
+.glyph.hex {
+  width: 0.52rem;
+  height: 0.52rem;
+  background: #d4b896;
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+}
+
+/* Sensors = cone/triangle (ConeGeometry) */
+.glyph.tri {
+  width: 0;
+  height: 0;
+  border-left: 0.28rem solid transparent;
+  border-right: 0.28rem solid transparent;
+  border-bottom: 0.5rem solid #7ec8a3;
+  background: transparent;
+  vertical-align: 0.02rem;
+}
+.glyph.tri.sensor { border-bottom-color: #7ec8a3; }
+.glyph.tri.sensor-failed { border-bottom-color: #555555; }
+
+/* Effectors = solid diamond (OctahedronGeometry) */
+.glyph.diamond {
+  width: 0.42rem;
+  height: 0.42rem;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  vertical-align: 0.02rem;
+}
+.glyph.diamond.jammer { background: #b8892e; }
+.glyph.diamond.kinetic { background: #a33b3b; }
+
+/* Fused tracks = spheres (SphereGeometry) — colorForTrack */
+.glyph.sphere { border-radius: 50%; }
+.glyph.sphere.selected { background: #c4f542; }
+.glyph.sphere.friendly { background: #4ecbff; }
+.glyph.sphere.rf-dark { background: #7a5cff; }
+.glyph.sphere.rf-dark-warn { background: #9b6dff; }
+.glyph.sphere.rf-dark-def { background: #c44dff; }
+.glyph.sphere.hostile-low { background: #d0d8d2; }
+.glyph.sphere.hostile-mid { background: #ffb347; }
+.glyph.sphere.hostile { background: #ff5c5c; }
+.glyph.sphere.hostile-warn { background: #ff6a3d; }
+.glyph.sphere.hostile-def { background: #ff2d2d; }
+
+/* Truth = wireframe diamond (debug OctahedronGeometry wireframe) */
+.glyph.wire-diamond {
+  width: 0.42rem;
+  height: 0.42rem;
+  transform: rotate(45deg);
+  background: transparent;
+  border: 1px solid #e040a0;
+  border-radius: 1px;
+  vertical-align: 0.02rem;
+}
+.glyph.wire-diamond.truth { border-color: #e040a0; }
+.glyph.wire-diamond.truth-jammed { border-color: #cc66aa; }
+.glyph.wire-diamond.truth-dead { border-color: #554455; }
 
 .phase-line {
   margin: 0.35rem 0 0 !important;
@@ -437,6 +538,24 @@ button.danger-btn:hover {
   margin-left: 0.35rem;
 }
 
+.hud-mode {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: 0.45rem;
+  padding-left: 0.45rem;
+  border-left: 1px solid var(--line);
+}
+
+.hud-mode button {
+  font-size: 0.62rem;
+  padding: 0.28rem 0.55rem;
+}
+
+.hud-mode .hud-auto {
+  border-color: var(--warn);
+}
+
 .hud-state {
   display: flex;
   flex-wrap: wrap;
@@ -446,6 +565,10 @@ button.danger-btn:hover {
   font-size: 0.62rem;
   color: var(--muted);
   letter-spacing: 0.03em;
+}
+
+.hud-state .hud-auto-badge strong {
+  color: var(--warn);
 }
 
 .downed-counters {
@@ -534,13 +657,6 @@ button.danger-btn:hover {
 .rec-effect {
   color: var(--ink);
 }
-.dot.sensor { background: var(--accent); }
-.dot.truth {
-  background: transparent;
-  border: 1px solid #e040a0;
-  box-sizing: border-box;
-}
-
 @media (max-width: 1100px) {
   .stage {
     grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);

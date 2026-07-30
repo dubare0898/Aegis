@@ -138,18 +138,18 @@
       "kind": "jammer",
       "position": { "x": -120, "y": 280, "z": 12 },
       "range_m": 4800,
-      "dwell_s": 14,
-      "cooldown_s": 10,
-      "power": 1.0
+      "dwell_s": 22,
+      "cooldown_s": 8,
+      "power": 1.15
     },
     {
       "id": "jammer-east",
       "kind": "jammer",
       "position": { "x": 360, "y": -40, "z": 12 },
       "range_m": 4500,
-      "dwell_s": 12,
-      "cooldown_s": 10,
-      "power": 0.95
+      "dwell_s": 20,
+      "cooldown_s": 8,
+      "power": 1.1
     },
     {
       "id": "c-uas-kinetic-1",
@@ -157,9 +157,29 @@
       "position": { "x": 60, "y": -20, "z": 8 },
       "range_m": 4200,
       "dwell_s": 3,
-      "cooldown_s": 15,
-      "pk_base": 0.75,
-      "tof_s": 2.2
+      "cooldown_s": 8,
+      "pk_base": 0.8,
+      "tof_s": 1.5
+    },
+    {
+      "id": "c-uas-kinetic-2",
+      "kind": "kinetic",
+      "position": { "x": -80, "y": 140, "z": 8 },
+      "range_m": 4000,
+      "dwell_s": 3,
+      "cooldown_s": 9,
+      "pk_base": 0.76,
+      "tof_s": 1.6
+    },
+    {
+      "id": "c-uas-kinetic-3",
+      "kind": "kinetic",
+      "position": { "x": 200, "y": 80, "z": 8 },
+      "range_m": 4100,
+      "dwell_s": 3,
+      "cooldown_s": 9,
+      "pk_base": 0.74,
+      "tof_s": 1.7
     }
   ]
 }

@@ -1,3 +1,5 @@
 # Aegis
 
-- [ ] Full rename (local; no push) — [Aegis full rename](ce73ec86-1340-45ee-a1a9-3a60c4adb49c)
+- [x] Leak + jumpy flight + autonomous engage — [Leak smooth auto engage](862cfb28-3b48-4071-9829-c2b3682b13ac)
+- [ ] Follow-up: scenario class picker over WS
+- [ ] KPI / run logging (awaiting store choice)
