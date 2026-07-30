@@ -2,11 +2,11 @@ mod effectors;
 mod sensors;
 mod swarm;
 
-use anyhow::{Context, Result};
-use cuas_schema::{
+use aegis_schema::{
     Affiliation, Detection, EffectorStatus, GoldenSnapshot, IdGen, ScenarioManifest, SensorKind,
     SensorStatus, Track, TrackClass, TruthEntity, Vec3, Zone,
 };
+use anyhow::{Context, Result};
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use serde::Deserialize;
@@ -241,7 +241,7 @@ impl Simulation {
         self.effectors.status(self.t)
     }
 
-    pub fn defeat_events(&self) -> &[cuas_schema::DefeatEvent] {
+    pub fn defeat_events(&self) -> &[aegis_schema::DefeatEvent] {
         self.effectors.defeat_events()
     }
 
@@ -430,7 +430,7 @@ pub fn resolve_scenario_dir(name: &str) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cuas_fusion::FusionEngine;
+    use aegis_fusion::FusionEngine;
 
     fn run_pipeline(seed: u64, ticks: u64) -> (GoldenSnapshot, GoldenSnapshot) {
         let dir = resolve_scenario_dir("military-base-swarm");
@@ -554,7 +554,7 @@ mod tests {
         let hit_or_miss = sim
             .effector_status()
             .iter()
-            .filter(|e| e.kind == cuas_schema::EffectorKind::Kinetic)
+            .filter(|e| e.kind == aegis_schema::EffectorKind::Kinetic)
             .any(|e| {
                 e.last_result
                     .as_deref()
@@ -566,7 +566,7 @@ mod tests {
             assert!(
                 sim.defeat_events()
                     .iter()
-                    .any(|e| e.cause == cuas_schema::DefeatCause::Kinetic),
+                    .any(|e| e.cause == aegis_schema::DefeatCause::Kinetic),
                 "neutralized hostile should emit kinetic defeat"
             );
         }
@@ -591,7 +591,7 @@ mod tests {
         assert!(
             sim.defeat_events()
                 .iter()
-                .any(|e| e.cause == cuas_schema::DefeatCause::Jamming && !e.rf_dark),
+                .any(|e| e.cause == aegis_schema::DefeatCause::Jamming && !e.rf_dark),
             "RF jam should emit jamming defeat"
         );
         let before = sim.defeat_events().len();
@@ -610,7 +610,7 @@ mod tests {
         let fiber_jams = sim
             .defeat_events()
             .iter()
-            .filter(|e| e.cause == cuas_schema::DefeatCause::Jamming && e.rf_dark)
+            .filter(|e| e.cause == aegis_schema::DefeatCause::Jamming && e.rf_dark)
             .count();
         assert_eq!(fiber_jams, 0, "fiber must not count as jamming defeat");
         assert!(

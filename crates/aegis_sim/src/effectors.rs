@@ -1,5 +1,5 @@
 use crate::swarm::SwarmMember;
-use cuas_schema::{DefeatCause, DefeatEvent, EffectorConfig, EffectorKind, EffectorStatus, Vec3};
+use aegis_schema::{DefeatCause, DefeatEvent, EffectorConfig, EffectorKind, EffectorStatus, Vec3};
 use rand::Rng;
 use rand_chacha::ChaCha8Rng;
 use std::collections::HashSet;

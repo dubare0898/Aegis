@@ -1,18 +1,18 @@
 [workspace]
 resolver = "2"
 members = [
-  "crates/cuas_schema",
-  "crates/cuas_sim",
-  "crates/cuas_fusion",
-  "crates/cuas_recommend",
-  "crates/cuas_scenario",
-  "crates/cuas_api",
+  "crates/aegis_schema",
+  "crates/aegis_sim",
+  "crates/aegis_fusion",
+  "crates/aegis_recommend",
+  "crates/aegis_scenario",
+  "crates/aegis_api",
   "tools/demo_harness",
 ]
 exclude = [
   "apps/desktop/src-tauri",
 ]
-default-members = ["crates/cuas_api"]
+default-members = ["crates/aegis_api"]
 
 [workspace.package]
 version = "0.1.0"
@@ -21,11 +21,11 @@ license = "MIT"
 authors = ["Aegis contributors"]
 
 [workspace.dependencies]
-cuas_schema = { path = "crates/cuas_schema" }
-cuas_sim = { path = "crates/cuas_sim" }
-cuas_fusion = { path = "crates/cuas_fusion" }
-cuas_recommend = { path = "crates/cuas_recommend" }
-cuas_scenario = { path = "crates/cuas_scenario" }
+aegis_schema = { path = "crates/aegis_schema" }
+aegis_sim = { path = "crates/aegis_sim" }
+aegis_fusion = { path = "crates/aegis_fusion" }
+aegis_recommend = { path = "crates/aegis_recommend" }
+aegis_scenario = { path = "crates/aegis_scenario" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["serde", "v4"] }

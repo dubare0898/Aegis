@@ -1,4 +1,4 @@
-use cuas_schema::{Affiliation, Track, TruthEntity, Vec3};
+use aegis_schema::{Affiliation, Track, TruthEntity, Vec3};
 use std::collections::HashMap;
 use uuid::Uuid;
 

@@ -17,10 +17,8 @@
 3. Optional: rename local folder to match the remote (`aegis`).
 4. Run `./scripts/install-desktop-entry.sh` for a local menu entry (writes absolute paths under `~/.local/share/applications/` only).
 
-## Intentionally not renamed this pass
+## Naming notes
 
-- Cargo package names: `cuas_schema`, `cuas_sim`, …
-- Scenario id: `military-base-swarm`
-- Binary / launcher script names under `scripts/`
-
-Deeper rename is optional follow-up once the public repo URL is stable.
+- Cargo packages / binaries: `aegis_*` (e.g. `aegis_api`, `aegis_schema`)
+- Scenario id kept as `military-base-swarm` (domain pack id, not product rename)
+- Prose may still say **C-UAS** (counter-UAS domain term)

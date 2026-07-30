@@ -1,5 +1,5 @@
 [package]
-name = "cuas_desktop"
+name = "aegis_desktop"
 version = "0.1.0"
 description = "Aegis desktop shell"
 authors = ["Aegis contributors"]
@@ -7,7 +7,7 @@ edition = "2021"
 license = "MIT"
 
 [lib]
-name = "cuas_desktop_lib"
+name = "aegis_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

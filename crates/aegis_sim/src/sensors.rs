@@ -1,6 +1,6 @@
 use crate::swarm::SwarmMember;
 use crate::{ClutterPoint, FriendlyEntity, GroundEntity};
-use cuas_schema::{Affiliation, Detection, IdGen, SensorConfig, SensorKind, TrackClass, Vec3};
+use aegis_schema::{Affiliation, Detection, IdGen, SensorConfig, SensorKind, TrackClass, Vec3};
 use rand::Rng;
 use rand_chacha::ChaCha8Rng;
 use uuid::Uuid;

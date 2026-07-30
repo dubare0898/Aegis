@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  // Served from cuas_api / Tauri webview at site root
+  // Served from aegis_api / Tauri webview at site root
   base: '/',
   clearScreen: false,
   server: {

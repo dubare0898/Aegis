@@ -1,3 +1,3 @@
 # Aegis
 
-- [ ] Threat prioritization for capability conservation — [implement](3614e64b-9677-486b-b701-488739adad1f) · plan `~/.cursor/plans/threat_priority_conserve_add77c36.plan.md`
+- [ ] Full rename (local; no push) — [Aegis full rename](ce73ec86-1340-45ee-a1a9-3a60c4adb49c)

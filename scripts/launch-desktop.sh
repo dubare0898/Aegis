@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Launchable desktop entry without requiring a Tauri rebuild.
-# Starts cuas_api (sim idle) + opens an app-style window when possible.
+# Starts aegis_api (sim idle) + opens an app-style window when possible.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PORT="${CUAS_PORT:-8080}"
-API_LOG="${TMPDIR:-/tmp}/cuas-api-desktop.log"
+PORT="${AEGIS_PORT:-8080}"
+API_LOG="${TMPDIR:-/tmp}/aegis-api-desktop.log"
 
 export PATH="${HOME}/.cargo/bin:${HOME}/.local/share/fnm:${PATH}"
 if command -v fnm >/dev/null 2>&1; then
@@ -19,13 +19,13 @@ if [[ ! -d apps/console/dist ]] || [[ ! -f apps/console/dist/index.html ]]; then
   (cd apps/console && npm run build)
 fi
 
-if [[ ! -x target/release/cuas_api && ! -x target/debug/cuas_api ]]; then
-  echo "[desktop] building cuas_api…"
-  CARGO_TARGET_DIR="$ROOT/target" cargo build -p cuas_api
+if [[ ! -x target/release/aegis_api && ! -x target/debug/aegis_api ]]; then
+  echo "[desktop] building aegis_api…"
+  CARGO_TARGET_DIR="$ROOT/target" cargo build -p aegis_api
 fi
 
-API_BIN="$ROOT/target/debug/cuas_api"
-[[ -x "$ROOT/target/release/cuas_api" ]] && API_BIN="$ROOT/target/release/cuas_api"
+API_BIN="$ROOT/target/debug/aegis_api"
+[[ -x "$ROOT/target/release/aegis_api" ]] && API_BIN="$ROOT/target/release/aegis_api"
 
 # Free port if a stale API is listening
 if command -v fuser >/dev/null 2>&1; then

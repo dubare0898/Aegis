@@ -3,11 +3,11 @@
 //! Determinism: the same `(class, seed)` always yields bit-identical JSON.
 //! Runtime sim RNG should use the same seed for full replay.
 
-use cuas_schema::{
+use aegis_schema::{
     EnvironmentConfig, FaultEvent, FaultPolicy, FriendlyConfig, ScenarioClass, ScenarioConstraints,
     ScenarioManifest, SpawnCorridor, SwarmConfig, TrackClass, Vec3,
 };
-use cuas_sim::resolve_scenario_dir;
+use aegis_sim::resolve_scenario_dir;
 use rand::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;

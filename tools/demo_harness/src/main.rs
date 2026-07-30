@@ -1,15 +1,15 @@
 mod scoring;
 
-use anyhow::{bail, Context, Result};
-use clap::Parser;
-use cuas_fusion::FusionEngine;
-use cuas_recommend::{is_mission_critical, RecommendEngine};
-use cuas_scenario::generate;
-use cuas_schema::{
+use aegis_fusion::FusionEngine;
+use aegis_recommend::{is_mission_critical, RecommendEngine};
+use aegis_scenario::generate;
+use aegis_schema::{
     Affiliation, Criticality, DemoMetrics, DispositionReasonCode, GoldenSnapshot, OperatorActor,
     OperatorDisposition, RecommendedAction, ScenarioClass, ScenarioManifest,
 };
-use cuas_sim::{resolve_scenario_dir, Simulation};
+use aegis_sim::{resolve_scenario_dir, Simulation};
+use anyhow::{bail, Context, Result};
+use clap::Parser;
 use scoring::{score_tracks, truth_kinematics_finite, SmoothnessAccum, MAX_TRACK_COUNT};
 use std::collections::{BTreeMap, HashSet};
 use std::fs;
@@ -92,7 +92,7 @@ fn high_fiber(m: &mut ScenarioManifest) {
     // Bring the raid into acoustic envelopes within the smoke horizon.
     m.swarm.start_range_m = 2400.0;
     for s in &mut m.sensors {
-        if s.kind == cuas_schema::SensorKind::Acoustic {
+        if s.kind == aegis_schema::SensorKind::Acoustic {
             s.pd = (s.pd + 0.08).min(0.92);
             s.range_m = s.range_m.max(1600.0);
         }
@@ -101,7 +101,7 @@ fn high_fiber(m: &mut ScenarioManifest) {
 
 fn low_pd(m: &mut ScenarioManifest) {
     for s in &mut m.sensors {
-        if s.kind == cuas_schema::SensorKind::Radar {
+        if s.kind == aegis_schema::SensorKind::Radar {
             s.pd = 0.55;
         }
     }
@@ -257,7 +257,7 @@ fn run_case_inner(
     let truth_hostiles = sim
         .truth_entities()
         .iter()
-        .filter(|e| e.affiliation == cuas_schema::Affiliation::Hostile)
+        .filter(|e| e.affiliation == aegis_schema::Affiliation::Hostile)
         .count();
 
     let mut last_tracks = Vec::new();
@@ -293,7 +293,7 @@ fn run_case_inner(
 
         let hostile_tracks = tracks
             .iter()
-            .filter(|tr| tr.affiliation != cuas_schema::Affiliation::Friendly)
+            .filter(|tr| tr.affiliation != aegis_schema::Affiliation::Friendly)
             .count();
         if time_to_first_track.is_none() && hostile_tracks > 0 {
             time_to_first_track = Some(t);
@@ -473,8 +473,8 @@ fn action_key(a: RecommendedAction) -> String {
 }
 
 /// Fiber hostiles should be tracked via radar/acoustic with little RF provenance.
-fn fiber_acoustic_ok(truth: &[cuas_schema::TruthEntity], tracks: &[cuas_schema::Track]) -> bool {
-    use cuas_schema::{Affiliation, SensorKind};
+fn fiber_acoustic_ok(truth: &[aegis_schema::TruthEntity], tracks: &[aegis_schema::Track]) -> bool {
+    use aegis_schema::{Affiliation, SensorKind};
     let fiber: Vec<_> = truth
         .iter()
         .filter(|e| e.rf_dark && e.affiliation == Affiliation::Hostile)
@@ -512,10 +512,10 @@ fn fiber_acoustic_ok(truth: &[cuas_schema::TruthEntity], tracks: &[cuas_schema::
 }
 
 /// Among open inbound recommendations, P1 should be among the tighter ETAs (impact can reorder near-ties).
-fn rank_eta_invariant(recs: &[cuas_schema::Recommendation]) -> bool {
+fn rank_eta_invariant(recs: &[aegis_schema::Recommendation]) -> bool {
     let mut inbound: Vec<(u32, f64)> = recs
         .iter()
-        .filter(|r| r.status == cuas_schema::RecommendationStatus::Open)
+        .filter(|r| r.status == aegis_schema::RecommendationStatus::Open)
         .filter_map(|r| r.eta_s.map(|eta| (r.priority, eta)))
         .collect();
     if inbound.len() < 2 {
@@ -533,8 +533,8 @@ fn rank_eta_invariant(recs: &[cuas_schema::Recommendation]) -> bool {
 
 /// Returns (ok, fratricide_count, other_safety_count).
 fn doctrine_stats(
-    tracks: &[cuas_schema::Track],
-    recs: &[cuas_schema::Recommendation],
+    tracks: &[aegis_schema::Track],
+    recs: &[aegis_schema::Recommendation],
 ) -> (bool, usize, usize) {
     let mut frat = 0usize;
     let mut safe = 0usize;
@@ -543,7 +543,7 @@ fn doctrine_stats(
             if tr.affiliation == Affiliation::Friendly && is_mission_critical(r.action) {
                 frat += 1;
             }
-            if (tr.rf_dark || tr.class_hypothesis == cuas_schema::TrackClass::FiberOpticUas)
+            if (tr.rf_dark || tr.class_hypothesis == aegis_schema::TrackClass::FiberOpticUas)
                 && r.action == RecommendedAction::RequestJammerAuthorization
             {
                 safe += 1;
@@ -561,10 +561,10 @@ fn doctrine_stats(
 fn soft_accept_audits(
     recommend: &mut RecommendEngine,
     t: f64,
-    recs: &[cuas_schema::Recommendation],
+    recs: &[aegis_schema::Recommendation],
 ) -> bool {
     let soft = recs.iter().find(|r| {
-        r.status == cuas_schema::RecommendationStatus::Open
+        r.status == aegis_schema::RecommendationStatus::Open
             && r.criticality == Criticality::Soft
             && !r.requires_confirmation
             && matches!(
@@ -695,7 +695,7 @@ fn run_batch(args: &Args) -> Result<()> {
         .ok_or_else(|| anyhow::anyhow!("--batch requires --class <name>|all"))?;
     let classes = parse_classes(class_spec)?;
     println!(
-        "CUAS batch: classes={} seeds={}..{}",
+        "Aegis batch: classes={} seeds={}..{}",
         classes.len(),
         args.seed_start,
         args.seed_start + args.seed_count.saturating_sub(1)
@@ -747,7 +747,7 @@ fn run_soak(args: &Args) -> Result<()> {
         args.ticks
     };
     println!(
-        "CUAS soak: class={} seed={} ticks={}",
+        "Aegis soak: class={} seed={} ticks={}",
         class.as_str(),
         args.seed,
         ticks
@@ -790,7 +790,7 @@ fn main() -> Result<()> {
         if suite != "smoke" {
             bail!("unknown suite '{suite}' (supported: smoke)");
         }
-        println!("CUAS smoke suite");
+        println!("Aegis smoke suite");
         let mut all_ok = true;
         let mut results = Vec::new();
         for case in smoke_cases() {
@@ -844,7 +844,7 @@ fn main() -> Result<()> {
     if args.json {
         println!("{}", serde_json::to_string_pretty(&result.metrics)?);
     } else {
-        println!("CUAS demo harness");
+        println!("Aegis demo harness");
         print_metrics(&result.metrics);
     }
 

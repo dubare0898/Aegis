@@ -13,7 +13,7 @@ services:
       - "8080:8080"
     environment:
       PORT: "8080"
-    # entrypoint-api.sh → cuas_api --console-dist /app/console when baked
+    # entrypoint-api.sh → aegis_api --console-dist /app/console when baked
 
   harness:
     image: aegis:local

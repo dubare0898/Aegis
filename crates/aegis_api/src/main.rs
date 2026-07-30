@@ -1,13 +1,13 @@
+use aegis_fusion::FusionEngine;
+use aegis_recommend::{AcceptEffect, RecommendEngine};
+use aegis_schema::{AirPicture, ClientCommand, OperatorState, ServerMessage, ZoneKind};
+use aegis_sim::{resolve_scenario_dir, Simulation};
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use clap::Parser;
-use cuas_fusion::FusionEngine;
-use cuas_recommend::{AcceptEffect, RecommendEngine};
-use cuas_schema::{AirPicture, ClientCommand, OperatorState, ServerMessage, ZoneKind};
-use cuas_sim::{resolve_scenario_dir, Simulation};
 use futures_util::{SinkExt, StreamExt};
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -20,7 +20,7 @@ use tracing::{info, warn};
 use uuid::Uuid;
 
 #[derive(Parser, Debug)]
-#[command(name = "cuas_api")]
+#[command(name = "aegis_api")]
 struct Args {
     #[arg(long, default_value = "military-base-swarm")]
     scenario: String,
@@ -42,7 +42,7 @@ struct AppState {
     recommend: RwLock<RecommendEngine>,
     last_picture: RwLock<Option<AirPicture>>,
     /// Latest fused track positions for effector targeting.
-    last_track_pos: RwLock<Vec<(Uuid, cuas_schema::Vec3)>>,
+    last_track_pos: RwLock<Vec<(Uuid, aegis_schema::Vec3)>>,
     tx: broadcast::Sender<String>,
 }
 
@@ -51,7 +51,7 @@ async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "cuas_api=info,tower_http=info".into()),
+                .unwrap_or_else(|_| "aegis_api=info,tower_http=info".into()),
         )
         .init();
 
@@ -147,9 +147,9 @@ async fn main() -> anyhow::Result<()> {
 fn build_picture(
     sim: &Simulation,
     recommend: &RecommendEngine,
-    detections: Vec<cuas_schema::Detection>,
-    tracks: Vec<cuas_schema::Track>,
-    recommendations: Vec<cuas_schema::Recommendation>,
+    detections: Vec<aegis_schema::Detection>,
+    tracks: Vec<aegis_schema::Track>,
+    recommendations: Vec<aegis_schema::Recommendation>,
 ) -> AirPicture {
     AirPicture {
         t: sim.t,
@@ -304,7 +304,7 @@ async fn apply_accept_effect(state: &AppState, effect: AcceptEffect) {
                     .map(|(_, p)| *p)
             };
             let mut sim = state.sim.write().await;
-            let pos = track_pos.unwrap_or(cuas_schema::Vec3::zero());
+            let pos = track_pos.unwrap_or(aegis_schema::Vec3::zero());
             let note = sim.activate_jammer(track_id, pos);
             drop(sim);
             state.recommend.write().await.annotate_effect_result(note);
@@ -332,7 +332,7 @@ async fn apply_accept_effect(state: &AppState, effect: AcceptEffect) {
                     .map(|(_, p)| *p)
             };
             let mut sim = state.sim.write().await;
-            let pos = track_pos.unwrap_or(cuas_schema::Vec3::zero());
+            let pos = track_pos.unwrap_or(aegis_schema::Vec3::zero());
             let note = sim.fire_kinetic(track_id, pos);
             drop(sim);
             state.recommend.write().await.annotate_effect_result(note);

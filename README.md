@@ -25,17 +25,17 @@
 ## Architecture
 
 ```
-scenarios/ ──► cuas_scenario (generate) ──► ScenarioManifest
+scenarios/ ──► aegis_scenario (generate) ──► ScenarioManifest
                       │
                       ▼
-              cuas_sim (truth, sensors, effectors)
+              aegis_sim (truth, sensors, effectors)
                       │
                       ▼
-              cuas_fusion ──► cuas_recommend
+              aegis_fusion ──► aegis_recommend
                       │
           ┌───────────┴───────────┐
           ▼                       ▼
-     cuas_api (WS)          demo_harness
+     aegis_api (WS)          demo_harness
           ▼
    apps/console (+ optional Tauri desktop)
 ```
@@ -44,19 +44,17 @@ scenarios/ ──► cuas_scenario (generate) ──► ScenarioManifest
 
 | Path | Role |
 |------|------|
-| `crates/cuas_schema` | Shared types (manifest, tracks, recommendations, metrics) |
-| `crates/cuas_sim` | Truth motion, sensors, simulated effectors |
-| `crates/cuas_fusion` | Deterministic track fusion |
-| `crates/cuas_recommend` | Doctrine-aware recommendations + dispose |
-| `crates/cuas_scenario` | Seeded class → manifest generation |
-| `crates/cuas_api` | HTTP/WebSocket snapshot + commands |
+| `crates/aegis_schema` | Shared types (manifest, tracks, recommendations, metrics) |
+| `crates/aegis_sim` | Truth motion, sensors, simulated effectors |
+| `crates/aegis_fusion` | Deterministic track fusion |
+| `crates/aegis_recommend` | Doctrine-aware recommendations + dispose |
+| `crates/aegis_scenario` | Seeded class → manifest generation |
+| `crates/aegis_api` | HTTP/WebSocket snapshot + commands |
 | `apps/console` | React operator UI |
 | `apps/desktop` | Optional Tauri shell |
 | `scenarios/` | Site packs (golden: `military-base-swarm`) |
 | `tools/demo_harness` | Golden, smoke, batch, soak |
 | `DEMO.md` | 90-second evaluator script |
-
-Rust package names remain `cuas_*` for stability; **Aegis** is the product name.
 
 ## Quickstart (native — primary)
 
@@ -78,7 +76,7 @@ CARGO_TARGET_DIR="$PWD/target" cargo run -p demo_harness -- --assert-golden
 Two-terminal console (optional):
 
 ```bash
-CARGO_TARGET_DIR="$PWD/target" cargo run -p cuas_api
+CARGO_TARGET_DIR="$PWD/target" cargo run -p aegis_api
 cd apps/console && npm install && npm run dev
 ```
 
@@ -90,7 +88,7 @@ Containerize the **API + harness** (and a baked static console) for onboarding/C
 
 | In the image | Not in Docker |
 |--------------|---------------|
-| `cuas_api` on `0.0.0.0:8080` | Tauri / `./scripts/launch-desktop.sh` |
+| `aegis_api` on `0.0.0.0:8080` | Tauri / `./scripts/launch-desktop.sh` |
 | `demo_harness` (smoke / batch / soak) | Hot-reload `npm run dev` |
 | `scenarios/` + optional console `dist` | Day-to-day Rust edit/rebuild loop |
 
@@ -124,7 +122,7 @@ docker compose build --build-arg BUILD_CONSOLE=0
 
 ## Deterministic scenario generation
 
-`cuas_scenario::generate(class, seed)` expands the military-base template into a resolved `ScenarioManifest`. **Same class + seed → identical JSON and sim outputs** when the run seed matches the generation seed.
+`aegis_scenario::generate(class, seed)` expands the military-base template into a resolved `ScenarioManifest`. **Same class + seed → identical JSON and sim outputs** when the run seed matches the generation seed.
 
 Classes (v1):
 
@@ -147,7 +145,6 @@ The hand-authored `scenarios/military-base-swarm` pack + seed **42** remains the
 ## Roadmap (near-term)
 
 - Stronger batch reporting / CI class sample
-- Optional crate/repo rename consistency (`aegis` on GitHub)
 - Live-sensor adapter spike (read-only) behind a feature flag
 
 ## License / contributing / security

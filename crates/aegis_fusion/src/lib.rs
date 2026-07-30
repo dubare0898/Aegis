@@ -1,4 +1,4 @@
-use cuas_schema::{
+use aegis_schema::{
     Affiliation, Detection, IdGen, IdentityBasis, SensorKind, Track, TrackClass, TrackStatus, Vec3,
 };
 use std::collections::HashSet;
@@ -335,7 +335,7 @@ fn merge_affiliation(a: Affiliation, b: Affiliation) -> Affiliation {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cuas_schema::SensorKind;
+    use aegis_schema::SensorKind;
 
     fn det(
         id: u128,

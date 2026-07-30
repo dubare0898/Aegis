@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Aegis headless stack: cuas_api + demo_harness (+ optional static console).
+# Aegis headless stack: aegis_api + demo_harness (+ optional static console).
 # Native ./scripts/launch-desktop.sh remains the primary local workflow.
 # Tauri desktop is intentionally not containerized.
 
@@ -11,8 +11,8 @@ COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
 COPY tools ./tools
 # Release binaries for API + harness only.
-RUN cargo build --release -p cuas_api -p demo_harness \
-    && strip target/release/cuas_api target/release/demo_harness
+RUN cargo build --release -p aegis_api -p demo_harness \
+    && strip target/release/aegis_api target/release/demo_harness
 
 FROM node:22-bookworm AS console-builder
 ARG BUILD_CONSOLE=1
@@ -35,9 +35,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --uid 10001 --create-home --home-dir /home/aegis --shell /usr/sbin/nologin aegis
 
-COPY --from=rust-builder /src/target/release/cuas_api /src/target/release/demo_harness /usr/local/bin/
+COPY --from=rust-builder /src/target/release/aegis_api /src/target/release/demo_harness /usr/local/bin/
 COPY docker/entrypoint-api.sh /usr/local/bin/entrypoint-api.sh
-RUN chmod 755 /usr/local/bin/entrypoint-api.sh /usr/local/bin/cuas_api /usr/local/bin/demo_harness
+RUN chmod 755 /usr/local/bin/entrypoint-api.sh /usr/local/bin/aegis_api /usr/local/bin/demo_harness
 
 WORKDIR /app
 COPY scenarios /app/scenarios

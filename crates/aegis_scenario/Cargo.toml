@@ -1,12 +1,12 @@
 [package]
-name = "cuas_scenario"
+name = "aegis_scenario"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
-cuas_schema = { workspace = true }
-cuas_sim = { workspace = true }
+aegis_schema = { workspace = true }
+aegis_sim = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 rand = { workspace = true }

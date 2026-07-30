@@ -1,4 +1,4 @@
-use cuas_schema::{IdGen, SwarmConfig, Vec3, Zone, ZoneKind};
+use aegis_schema::{IdGen, SwarmConfig, Vec3, Zone, ZoneKind};
 use rand::Rng;
 use rand_chacha::ChaCha8Rng;
 use uuid::Uuid;

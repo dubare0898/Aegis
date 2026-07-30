@@ -44,7 +44,7 @@ progress.md
 *.msi
 apps/desktop/src-tauri/target/
 apps/desktop/src-tauri/gen/
-apps/desktop/src-tauri/resources/cuas_api
+apps/desktop/src-tauri/resources/aegis_api
 apps/desktop/src-tauri/resources/console/
 apps/desktop/src-tauri/resources/scenarios/
 

@@ -20,6 +20,6 @@ Demo defaults favor a readable raid inside ~90s wall-clock at **4×** speed.
 ```bash
 ./scripts/launch-desktop.sh
 # or
-cargo run -p cuas_api -- --scenario military-base-swarm
+cargo run -p aegis_api -- --scenario military-base-swarm
 cargo run -p demo_harness -- --seed 42 --ticks 600
 ```

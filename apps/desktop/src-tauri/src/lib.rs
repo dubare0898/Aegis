@@ -19,11 +19,11 @@ fn resource_root(app: &AppHandle) -> Result<PathBuf, String> {
 
 fn resolve_api_binary(root: &PathBuf) -> PathBuf {
     let candidates = [
-        root.join("resources/cuas_api"),
-        root.join("cuas_api"),
+        root.join("resources/aegis_api"),
+        root.join("aegis_api"),
         // Dev: workspace release/debug next to checkout
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../target/debug/cuas_api"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../target/release/cuas_api"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../target/debug/aegis_api"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../target/release/aegis_api"),
     ];
     for c in candidates {
         if c.exists() {
@@ -103,7 +103,7 @@ fn spawn_api(app: &AppHandle) -> Result<Child, String> {
 
     if !api_bin.exists() {
         return Err(format!(
-            "cuas_api binary not found at {} — run scripts/prepare-desktop-resources.sh",
+            "aegis_api binary not found at {} — run scripts/prepare-desktop-resources.sh",
             api_bin.display()
         ));
     }
@@ -140,7 +140,7 @@ fn spawn_api(app: &AppHandle) -> Result<Child, String> {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
-        .map_err(|e| format!("spawn cuas_api ({}): {e}", api_bin.display()))
+        .map_err(|e| format!("spawn aegis_api ({}): {e}", api_bin.display()))
 }
 
 fn kill_api(state: &ApiProcess) {
@@ -159,7 +159,7 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             let child = spawn_api(&handle).map_err(|e| {
-                eprintln!("[cuas-desktop] {e}");
+                eprintln!("[aegis-desktop] {e}");
                 e
             })?;
             {
@@ -168,7 +168,7 @@ pub fn run() {
             }
 
             if !wait_for_health(Duration::from_secs(15)) {
-                eprintln!("[cuas-desktop] timed out waiting for cuas_api on :{API_PORT}");
+                eprintln!("[aegis-desktop] timed out waiting for aegis_api on :{API_PORT}");
             }
 
             if let Some(window) = app.get_webview_window("main") {
@@ -180,7 +180,7 @@ pub fn run() {
             Ok(())
         })
         .build(tauri::generate_context!())
-        .expect("error building CUAS desktop")
+        .expect("error building Aegis desktop")
         .run(|app_handle, event| {
             if let RunEvent::Exit = event {
                 let state = app_handle.state::<ApiProcess>();

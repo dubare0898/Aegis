@@ -8,7 +8,7 @@ if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env)"
 fi
 
-cargo run -p cuas_api -- --port 8080 &
+cargo run -p aegis_api -- --port 8080 &
 API_PID=$!
 trap 'kill $API_PID 2>/dev/null || true' EXIT
 

@@ -3,6 +3,81 @@
 version = 4
 
 [[package]]
+name = "aegis_api"
+version = "0.1.0"
+dependencies = [
+ "aegis_fusion",
+ "aegis_recommend",
+ "aegis_schema",
+ "aegis_sim",
+ "anyhow",
+ "axum",
+ "clap",
+ "futures-util",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
+name = "aegis_fusion"
+version = "0.1.0"
+dependencies = [
+ "aegis_schema",
+ "uuid",
+]
+
+[[package]]
+name = "aegis_recommend"
+version = "0.1.0"
+dependencies = [
+ "aegis_schema",
+ "uuid",
+]
+
+[[package]]
+name = "aegis_scenario"
+version = "0.1.0"
+dependencies = [
+ "aegis_schema",
+ "aegis_sim",
+ "rand 0.8.7",
+ "rand_chacha 0.3.1",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "aegis_schema"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "aegis_sim"
+version = "0.1.0"
+dependencies = [
+ "aegis_fusion",
+ "aegis_schema",
+ "anyhow",
+ "rand 0.8.7",
+ "rand_chacha 0.3.1",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "uuid",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -278,81 +353,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cuas_api"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "cuas_fusion",
- "cuas_recommend",
- "cuas_schema",
- "cuas_sim",
- "futures-util",
- "serde",
- "serde_json",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
-name = "cuas_fusion"
-version = "0.1.0"
-dependencies = [
- "cuas_schema",
- "uuid",
-]
-
-[[package]]
-name = "cuas_recommend"
-version = "0.1.0"
-dependencies = [
- "cuas_schema",
- "uuid",
-]
-
-[[package]]
-name = "cuas_scenario"
-version = "0.1.0"
-dependencies = [
- "cuas_schema",
- "cuas_sim",
- "rand 0.8.7",
- "rand_chacha 0.3.1",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "cuas_schema"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "uuid",
-]
-
-[[package]]
-name = "cuas_sim"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cuas_fusion",
- "cuas_schema",
- "rand 0.8.7",
- "rand_chacha 0.3.1",
- "serde",
- "serde_json",
- "thiserror",
- "uuid",
-]
-
-[[package]]
 name = "data-encoding"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -362,13 +362,13 @@ checksum = "a4ae5f15dda3c708c0ade84bfee31ccab44a3da4f88015ed22f63732abe300c8"
 name = "demo_harness"
 version = "0.1.0"
 dependencies = [
+ "aegis_fusion",
+ "aegis_recommend",
+ "aegis_scenario",
+ "aegis_schema",
+ "aegis_sim",
  "anyhow",
  "clap",
- "cuas_fusion",
- "cuas_recommend",
- "cuas_scenario",
- "cuas_schema",
- "cuas_sim",
  "serde",
  "serde_json",
  "uuid",

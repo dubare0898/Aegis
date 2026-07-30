@@ -1,4 +1,4 @@
-use cuas_schema::{
+use aegis_schema::{
     Affiliation, Criticality, DispositionReasonCode, EvidenceItem, OperatorActor,
     OperatorDisposition, OperatorEvent, OperatorState, Recommendation, RecommendationStatus,
     RecommendedAction, RecommendedBy, SensorKind, Track, TrackClass, Vec3, Zone, ZoneKind,
@@ -942,7 +942,7 @@ mod tests {
             affiliation: Affiliation::Friendly,
             class_hypothesis: TrackClass::Manned,
             sensor_provenance: vec![SensorKind::Adsb],
-            identity_basis: cuas_schema::IdentityBasis::Adsb,
+            identity_basis: aegis_schema::IdentityBasis::Adsb,
             position: Vec3::new(400.0, 0.0, 200.0),
             threat_score: 99.0,
             ..sample_track(id, false)

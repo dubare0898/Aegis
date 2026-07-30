@@ -1,5 +1,5 @@
 {
-  "name": "cuas-desktop",
+  "name": "aegis-desktop",
   "private": true,
   "version": "0.1.0",
   "description": "Aegis desktop shell (Tauri)",

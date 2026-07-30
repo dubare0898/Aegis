@@ -9,11 +9,11 @@ name = "demo_harness"
 path = "src/main.rs"
 
 [dependencies]
-cuas_schema = { workspace = true }
-cuas_sim = { workspace = true }
-cuas_fusion = { workspace = true }
-cuas_recommend = { workspace = true }
-cuas_scenario = { workspace = true }
+aegis_schema = { workspace = true }
+aegis_sim = { workspace = true }
+aegis_fusion = { workspace = true }
+aegis_recommend = { workspace = true }
+aegis_scenario = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 clap = { workspace = true }

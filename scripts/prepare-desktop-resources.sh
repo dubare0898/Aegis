@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build cuas_api + console and stage them for the Tauri desktop app.
+# Build aegis_api + console and stage them for the Tauri desktop app.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -25,23 +25,23 @@ rm -rf "$RES/console"
 mkdir -p "$RES/console"
 cp -a "$ROOT/apps/console/dist/." "$RES/console/"
 
-echo "[desktop] building cuas_api…"
+echo "[desktop] building aegis_api…"
 # Always use the workspace target dir (ignore ambient CARGO_TARGET_DIR).
 if [[ "$DEV_MODE" -eq 1 ]]; then
-  (cd "$ROOT" && CARGO_TARGET_DIR="$ROOT/target" cargo build -p cuas_api)
-  API_BIN="$ROOT/target/debug/cuas_api"
+  (cd "$ROOT" && CARGO_TARGET_DIR="$ROOT/target" cargo build -p aegis_api)
+  API_BIN="$ROOT/target/debug/aegis_api"
 else
-  (cd "$ROOT" && CARGO_TARGET_DIR="$ROOT/target" cargo build -p cuas_api --release)
-  API_BIN="$ROOT/target/release/cuas_api"
+  (cd "$ROOT" && CARGO_TARGET_DIR="$ROOT/target" cargo build -p aegis_api --release)
+  API_BIN="$ROOT/target/release/aegis_api"
 fi
 
 if [[ ! -x "$API_BIN" ]]; then
-  echo "error: cuas_api binary not found at $API_BIN" >&2
+  echo "error: aegis_api binary not found at $API_BIN" >&2
   exit 1
 fi
 
-cp -f "$API_BIN" "$RES/cuas_api"
-chmod +x "$RES/cuas_api"
+cp -f "$API_BIN" "$RES/aegis_api"
+chmod +x "$RES/aegis_api"
 
 echo "[desktop] copying scenarios…"
 rm -rf "$RES/scenarios"
